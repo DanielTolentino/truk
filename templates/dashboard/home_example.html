@@ -1,0 +1,226 @@
+{% extends 'base/base.html' %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/animations.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <!-- Page Header -->
+    <div style="margin-bottom: var(--spacing-8);">
+        <h1 class="gradient-text" style="font-size: var(--font-size-4xl); font-weight: var(--font-weight-bold); margin-bottom: var(--spacing-2);">
+            Dashboard
+        </h1>
+        <p style="color: var(--text-secondary); font-size: var(--font-size-lg);">
+            Bem-vindo de volta, {{ user.get_full_name|default:user.username }}! 👋
+        </p>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions slide-in-down">
+        <a href="{% url 'loads:create' %}" class="quick-action">
+            <div class="quick-action-icon">🚚</div>
+            <div class="quick-action-label">Nova Carga</div>
+        </a>
+        <a href="{% url 'loads:list' %}" class="quick-action" style="background: linear-gradient(135deg, var(--color-success), #059669);">
+            <div class="quick-action-icon">📦</div>
+            <div class="quick-action-label">Minhas Cargas</div>
+        </a>
+        <a href="{% url 'dashboard:analytics' %}" class="quick-action" style="background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));">
+            <div class="quick-action-icon">📊</div>
+            <div class="quick-action-label">Analytics</div>
+        </a>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card stagger-item">
+            <div class="stat-icon">📦</div>
+            <div class="stat-label">Total de Cargas</div>
+            <div class="stat-value">{{ total_loads }}</div>
+            <div class="stat-change positive">
+                ↑ 8.2% vs. mês passado
+            </div>
+        </div>
+
+        <div class="stat-card success stagger-item">
+            <div class="stat-icon">✅</div>
+            <div class="stat-label">Concluídas</div>
+            <div class="stat-value">{{ completed_loads }}</div>
+            <div class="stat-change positive">
+                ↑ 12.5% este mês
+            </div>
+        </div>
+
+        <div class="stat-card warning stagger-item">
+            <div class="stat-icon">🚛</div>
+            <div class="stat-label">Em Andamento</div>
+            <div class="stat-value">{{ active_loads }}</div>
+            <div class="stat-change">
+                {{ active_loads }} ativas agora
+            </div>
+        </div>
+
+        <div class="stat-card stagger-item">
+            <div class="stat-icon">🛣️</div>
+            <div class="stat-label">Distância Total</div>
+            <div class="stat-value">{{ total_distance|floatformat:0 }} km</div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 75%;"></div>
+            </div>
+        </div>
+
+        <div class="stat-card success stagger-item">
+            <div class="stat-icon">💰</div>
+            <div class="stat-label">Receita Total</div>
+            <div class="stat-value">€{{ total_revenue|floatformat:2 }}</div>
+            <div class="stat-change positive">
+                ↑ €2,340 este mês
+            </div>
+        </div>
+
+        <div class="stat-card error stagger-item">
+            <div class="stat-icon">⚠️</div>
+            <div class="stat-label">Total Multas</div>
+            <div class="stat-value">€{{ total_fines|floatformat:2 }}</div>
+            <div class="stat-change negative">
+                ↓ 15% vs. mês passado
+            </div>
+        </div>
+
+        <div class="stat-card success stagger-item">
+            <div class="stat-icon">📈</div>
+            <div class="stat-label">Lucro Líquido</div>
+            <div class="stat-value">€{{ net_profit|floatformat:2 }}</div>
+            <div class="stat-change positive">
+                ↑ 18.3% crescimento
+            </div>
+        </div>
+
+        <div class="stat-card stagger-item">
+            <div class="stat-icon">⛽</div>
+            <div class="stat-label">Combustível Total</div>
+            <div class="stat-value">{{ total_fuel|floatformat:0 }}L</div>
+            <div class="progress-bar">
+                <div class="progress-fill warning" style="width: 60%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Grid -->
+    <div class="dashboard-grid">
+        <!-- Chart Section -->
+        <div style="grid-column: span 2;">
+            <div class="chart-container slide-in-left">
+                <div class="chart-header">
+                    <div>
+                        <h2 class="chart-title">Cargas por Mês</h2>
+                        <p class="chart-subtitle">Últimos 6 meses</p>
+                    </div>
+                    <div class="chart-filters">
+                        <button class="chart-filter-btn active">6M</button>
+                        <button class="chart-filter-btn">1A</button>
+                        <button class="chart-filter-btn">Tudo</button>
+                    </div>
+                </div>
+                <div id="loads-chart">
+                    {{ loads_chart|safe }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="slide-in-right">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2 class="chart-title">Atividade Recente</h2>
+                </div>
+                <ul class="activity-list">
+                    {% for load in recent_loads %}
+                    <li class="activity-item">
+                        <div class="activity-icon">
+                            {% if load.status == 'completed' %}✅
+                            {% elif load.status == 'in_progress' %}🚛
+                            {% elif load.status == 'failed' %}❌
+                            {% else %}⏳{% endif %}
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">
+                                {{ load.origin_city }} → {{ load.destination_city }}
+                            </div>
+                            <div class="activity-meta">
+                                <span>{{ load.cargo_type }}</span>
+                                <span>€{{ load.payment }}</span>
+                                <span class="activity-time">{{ load.created_at|timesince }}</span>
+                            </div>
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <div class="empty-state-title">Nenhuma carga ainda</div>
+                        <div class="empty-state-text">Comece criando sua primeira carga!</div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Routes Section -->
+    <div class="chart-container slide-in-up" style="margin-top: var(--spacing-6);">
+        <div class="chart-header">
+            <div>
+                <h2 class="chart-title">Top 5 Rotas</h2>
+                <p class="chart-subtitle">Mais utilizadas este mês</p>
+            </div>
+        </div>
+        <div class="top-routes-table">
+            {% for route in top_routes %}
+            <div class="route-row">
+                <div class="route-name">
+                    {{ route.route }}
+                </div>
+                <div class="route-count">
+                    {{ route.count }} viagens
+                </div>
+                <div class="route-revenue">
+                    €{{ route.total_revenue|floatformat:2 }}
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <div class="empty-state-icon">🗺️</div>
+                <div class="empty-state-text">Nenhuma rota registrada ainda</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Animate progress bars on load
+document.addEventListener('DOMContentLoaded', () => {
+    const progressBars = document.querySelectorAll('.progress-fill');
+    progressBars.forEach(bar => {
+        const width = bar.style.width;
+        bar.style.width = '0';
+        setTimeout(() => {
+            bar.style.width = width;
+        }, 300);
+    });
+});
+
+// Update chart filter buttons
+document.querySelectorAll('.chart-filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.chart-filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        // Here you would reload chart data
+        showToast('Filtro aplicado: ' + this.textContent, 'info');
+    });
+});
+</script>
+{% endblock %}
