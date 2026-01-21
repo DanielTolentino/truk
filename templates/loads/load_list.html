@@ -1,0 +1,86 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Minhas Cargas - TruK{% endblock %}
+
+{% block content %}
+<div class="loads-container">
+    <div class="page-header">
+        <h1>Minhas Cargas</h1>
+        <a href="{% url 'loads:create' %}" class="btn btn-primary">+ Nova Carga</a>
+    </div>
+    
+    <div class="filters">
+        <form method="get" class="filter-form">
+            <input type="text" name="search" placeholder="Buscar..." value="{{ request.GET.search }}" class="form-control">
+            
+            <select name="status" class="form-control">
+                <option value="">Todos os Status</option>
+                <option value="pendente" {% if request.GET.status == 'pendente' %}selected{% endif %}>Pendente</option>
+                <option value="em_andamento" {% if request.GET.status == 'em_andamento' %}selected{% endif %}>Em Andamento</option>
+                <option value="concluida" {% if request.GET.status == 'concluida' %}selected{% endif %}>Concluída</option>
+                <option value="falhada" {% if request.GET.status == 'falhada' %}selected{% endif %}>Falhada</option>
+            </select>
+            
+            <button type="submit" class="btn btn-secondary">Filtrar</button>
+        </form>
+    </div>
+    
+    {% if loads %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th>Rota</th>
+                    <th>Carga</th>
+                    <th>Distância</th>
+                    <th>Pagamento</th>
+                    <th>Dano</th>
+                    <th>Data</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for load in loads %}
+                <tr>
+                    <td><span class="status-badge status-{{ load.status }}">{{ load.get_status_display }}</span></td>
+                    <td><strong>{{ load.rota }}</strong></td>
+                    <td>{{ load.tipo_carga }}</td>
+                    <td>{{ load.distancia_km }} km</td>
+                    <td>€{{ load.pagamento_eur }}</td>
+                    <td>{{ load.dano_percentual }}%</td>
+                    <td>{{ load.data_criacao|date:"d/m/Y" }}</td>
+                    <td>
+                        <a href="{% url 'loads:detail' load.pk %}" class="btn-sm btn-info">Ver</a>
+                        <a href="{% url 'loads:edit' load.pk %}" class="btn-sm btn-secondary">Editar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page=1" class="btn btn-secondary">Primeira</a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">Anterior</a>
+        {% endif %}
+        
+        <span class="page-info">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">Próxima</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-secondary">Última</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <div class="empty-state">
+        <p>Nenhuma carga encontrada.</p>
+        <a href="{% url 'loads:create' %}" class="btn btn-primary">Criar Primeira Carga</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

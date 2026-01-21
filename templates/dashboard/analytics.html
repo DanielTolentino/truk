@@ -1,0 +1,131 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Analytics - TruK{% endblock %}
+
+{% block content %}
+<div class="analytics">
+    <h1>Analytics Avançado</h1>
+    
+    <div class="chart-container">
+        <h2>Evolução da Receita (12 meses)</h2>
+        <div id="revenueChart"></div>
+    </div>
+    
+    {% if driver_performance %}
+    <div class="performance-table">
+        <h2>Performance por Motorista</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Motorista</th>
+                    <th>Cargas</th>
+                    <th>Receita Total</th>
+                    <th>Dano Médio</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for driver in driver_performance %}
+                <tr>
+                    <td>{{ driver.motorista__username }}</td>
+                    <td>{{ driver.count }}</td>
+                    <td>€{{ driver.total_revenue|floatformat:2 }}</td>
+                    <td>{{ driver.avg_damage|floatformat:2 }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+    
+    <div class="analytics-grid">
+        <div class="analysis-card">
+            <h2>Análise por Trailer</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Qtd</th>
+                        <th>Receita</th>
+                        <th>Dano Médio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in trailer_analysis %}
+                    <tr>
+                        <td>{{ item.get_tipo_trailer_display|default:"N/A" }}</td>
+                        <td>{{ item.count }}</td>
+                        <td>€{{ item.total_revenue|floatformat:2 }}</td>
+                        <td>{{ item.avg_damage|floatformat:2 }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="analysis-card">
+            <h2>Top Países de Origem</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>País</th>
+                        <th>Cargas</th>
+                        <th>Receita</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in origin_analysis %}
+                    <tr>
+                        <td>{{ item.origem_pais }}</td>
+                        <td>{{ item.count }}</td>
+                        <td>€{{ item.total_revenue|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="analysis-card">
+            <h2>Top Países de Destino</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>País</th>
+                        <th>Cargas</th>
+                        <th>Receita</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in destination_analysis %}
+                    <tr>
+                        <td>{{ item.destino_pais }}</td>
+                        <td>{{ item.count }}</td>
+                        <td>€{{ item.total_revenue|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Gráfico de evolução de receita
+    const revenueData = {{ revenue_evolution|safe }};
+    const revenueTrace = {
+        x: revenueData.map(d => d.month),
+        y: revenueData.map(d => d.revenue),
+        type: 'scatter',
+        mode: 'lines+markers',
+        line: { color: '#27ae60', width: 3 },
+        marker: { size: 8 }
+    };
+    
+    const revenueLayout = {
+        title: '',
+        xaxis: { title: 'Mês' },
+        yaxis: { title: 'Receita (€)' }
+    };
+    
+    Plotly.newPlot('revenueChart', [revenueTrace], revenueLayout, {responsive: true});
+</script>
+{% endblock %}

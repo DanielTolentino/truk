@@ -1,0 +1,44 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Editar Perfil - TruK{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>Editar Perfil</h1>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% load widget_tweaks %}
+        
+        <div class="form-group">
+            <label>Nome</label>
+            {{ form.first_name|add_class:"form-control" }}
+        </div>
+        
+        <div class="form-group">
+            <label>Sobrenome</label>
+            {{ form.last_name|add_class:"form-control" }}
+        </div>
+        
+        <div class="form-group">
+            <label>Email</label>
+            {{ form.email|add_class:"form-control" }}
+        </div>
+        
+        <div class="form-group">
+            <label>Avatar</label>
+            {{ form.avatar|add_class:"form-control" }}
+        </div>
+        
+        <div class="form-group">
+            <label>Bio</label>
+            {{ form.bio|add_class:"form-control" }}
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Salvar</button>
+            <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

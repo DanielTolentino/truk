@@ -1,0 +1,33 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Perfil - TruK{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <h1>Perfil de {{ profile_user.username }}</h1>
+    
+    <div class="profile-card">
+        {% if profile_user.avatar %}
+            <img src="{{ profile_user.avatar.url }}" alt="Avatar" class="avatar-large">
+        {% else %}
+            <div class="avatar-placeholder">{{ profile_user.username.0|upper }}</div>
+        {% endif %}
+        
+        <div class="profile-info">
+            <h2>{{ profile_user.get_full_name|default:profile_user.username }}</h2>
+            <p class="role-badge">{{ profile_user.get_role_display }}</p>
+            <p><strong>Email:</strong> {{ profile_user.email }}</p>
+            <p><strong>Membro desde:</strong> {{ profile_user.data_entrada|date:"d/m/Y" }}</p>
+            
+            {% if profile_user.bio %}
+            <div class="bio">
+                <strong>Bio:</strong>
+                <p>{{ profile_user.bio }}</p>
+            </div>
+            {% endif %}
+            
+            <a href="{% url 'accounts:profile_edit' %}" class="btn btn-primary">Editar Perfil</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,150 @@
+{% extends 'base/base.html' %}
+{% load dashboard_extras %}
+
+{% block title %}Dashboard - TruK{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <h1>Dashboard</h1>
+    <p class="welcome">Bem-vindo, {{ user.get_full_name|default:user.username }}! 🚛</p>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">📦</div>
+            <div class="stat-info">
+                <h3>{{ total_loads }}</h3>
+                <p>Total de Cargas</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-info">
+                <h3>{{ completed_loads }}</h3>
+                <p>Concluídas</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">🚚</div>
+            <div class="stat-info">
+                <h3>{{ active_loads_count }}</h3>
+                <p>Em Andamento</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">🛣️</div>
+            <div class="stat-info">
+                <h3>{{ total_km|compact_number }} km</h3>
+                <p>Distância Total</p>
+            </div>
+        </div>
+        
+        <div class="stat-card success">
+            <div class="stat-icon">💰</div>
+            <div class="stat-info">
+                <h3>€{{ total_revenue|compact_number }}</h3>
+                <p>Receita Total</p>
+            </div>
+        </div>
+        
+        <div class="stat-card warning">
+            <div class="stat-icon">⚠️</div>
+            <div class="stat-info">
+                <h3>€{{ total_fines|compact_number }}</h3>
+                <p>Multas</p>
+            </div>
+        </div>
+        
+        <div class="stat-card info">
+            <div class="stat-icon">📊</div>
+            <div class="stat-info">
+                <h3>€{{ net_revenue|compact_number }}</h3>
+                <p>Lucro Líquido</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">⛽</div>
+            <div class="stat-info">
+                <h3>{{ total_fuel|compact_number }}L</h3>
+                <p>Combustível</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="dashboard-grid">
+        <div class="chart-container">
+            <h2>Cargas por Mês</h2>
+            <div id="monthsChart"></div>
+        </div>
+        
+        <div class="recent-loads">
+            <h2>Cargas Recentes</h2>
+            {% if recent_loads %}
+            <ul class="load-list">
+                {% for load in recent_loads %}
+                <li>
+                    <a href="{% url 'loads:detail' load.pk %}">
+                        <div class="load-item">
+                            <span class="status-badge status-{{ load.status }}">{{ load.get_status_display }}</span>
+                            <strong>{{ load.rota }}</strong>
+                            <small>{{ load.data_criacao|date:"d/m/Y H:i" }}</small>
+                            <span class="load-payment">€{{ load.pagamento_eur }}</span>
+                        </div>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="empty-state">Nenhuma carga registrada ainda.</p>
+            {% endif %}
+            <a href="{% url 'loads:list' %}" class="btn btn-secondary btn-block">Ver Todas</a>
+        </div>
+    </div>
+    
+    {% if top_routes %}
+    <div class="top-routes">
+        <h2>Top Rotas</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Rota</th>
+                    <th>Entregas</th>
+                    <th>Receita Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for route in top_routes %}
+                <tr>
+                    <td>{{ route.origem_cidade }} → {{ route.destino_cidade }}</td>
+                    <td>{{ route.count }}</td>
+                    <td>€{{ route.total_revenue|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // Gráfico de cargas por mês
+    const monthsData = {{ months_data|safe }};
+    const monthsTrace = {
+        x: monthsData.map(d => d.month),
+        y: monthsData.map(d => d.count),
+        type: 'bar',
+        marker: { color: '#3498db' }
+    };
+    
+    const monthsLayout = {
+        title: '',
+        xaxis: { title: 'Mês' },
+        yaxis: { title: 'Número de Cargas' }
+    };
+    
+    Plotly.newPlot('monthsChart', [monthsTrace], monthsLayout, {responsive: true});
+</script>
+{% endblock %}
