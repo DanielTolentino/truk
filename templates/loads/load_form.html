@@ -6,36 +6,36 @@
 <div class="form-container">
     <h1>{% if object %}Editar Carga{% else %}Registrar Nova Carga{% endif %}</h1>
     
-    <form method="post" enctype="multipart/form-data" class="load-form">
+    <form method="post" enctype="multipart/form-data" class="load-form" aria-label="Formulário de carga">
         {% csrf_token %}
         
         <fieldset>
             <legend>Origem e Destino</legend>
             <div class="form-row">
                 <div class="form-group">
-                    <label>Cidade de Origem *</label>
+                    <label for="id_origem_cidade">Cidade de Origem *</label>
                     {{ form.origem_cidade }}
-                    {% if form.origem_cidade.errors %}<span class="error">{{ form.origem_cidade.errors }}</span>{% endif %}
+                    {% if form.origem_cidade.errors %}<span class="error" role="alert" aria-live="polite">{{ form.origem_cidade.errors }}</span>{% endif %}
                 </div>
                 
                 <div class="form-group">
-                    <label>País de Origem *</label>
+                    <label for="id_origem_pais">País de Origem *</label>
                     {{ form.origem_pais }}
-                    {% if form.origem_pais.errors %}<span class="error">{{ form.origem_pais.errors }}</span>{% endif %}
+                    {% if form.origem_pais.errors %}<span class="error" role="alert" aria-live="polite">{{ form.origem_pais.errors }}</span>{% endif %}
                 </div>
             </div>
             
             <div class="form-row">
                 <div class="form-group">
-                    <label>Cidade de Destino *</label>
+                    <label for="id_destino_cidade">Cidade de Destino *</label>
                     {{ form.destino_cidade }}
-                    {% if form.destino_cidade.errors %}<span class="error">{{ form.destino_cidade.errors }}</span>{% endif %}
+                    {% if form.destino_cidade.errors %}<span class="error" role="alert" aria-live="polite">{{ form.destino_cidade.errors }}</span>{% endif %}
                 </div>
                 
                 <div class="form-group">
-                    <label>País de Destino *</label>
+                    <label for="id_destino_pais">País de Destino *</label>
                     {{ form.destino_pais }}
-                    {% if form.destino_pais.errors %}<span class="error">{{ form.destino_pais.errors }}</span>{% endif %}
+                    {% if form.destino_pais.errors %}<span class="error" role="alert" aria-live="polite">{{ form.destino_pais.errors }}</span>{% endif %}
                 </div>
             </div>
         </fieldset>
@@ -44,19 +44,19 @@
             <legend>Informações da Carga</legend>
             <div class="form-row">
                 <div class="form-group">
-                    <label>Tipo de Carga *</label>
+                    <label for="id_tipo_carga">Tipo de Carga *</label>
                     {{ form.tipo_carga }}
-                    {% if form.tipo_carga.errors %}<span class="error">{{ form.tipo_carga.errors }}</span>{% endif %}
+                    {% if form.tipo_carga.errors %}<span class="error" role="alert" aria-live="polite">{{ form.tipo_carga.errors }}</span>{% endif %}
                 </div>
                 
                 <div class="form-group">
-                    <label>Tipo de Trailer</label>
+                    <label for="id_tipo_trailer">Tipo de Trailer</label>
                     {{ form.tipo_trailer }}
                 </div>
             </div>
             
             <div class="form-group">
-                <label>Peso (toneladas)</label>
+                <label for="id_peso_toneladas">Peso (toneladas)</label>
                 {{ form.peso_toneladas }}
             </div>
         </fieldset>
@@ -65,15 +65,15 @@
             <legend>Distância e Pagamento</legend>
             <div class="form-row">
                 <div class="form-group">
-                    <label>Distância (km) *</label>
+                    <label for="id_distancia_km">Distância (km) *</label>
                     {{ form.distancia_km }}
-                    {% if form.distancia_km.errors %}<span class="error">{{ form.distancia_km.errors }}</span>{% endif %}
+                    {% if form.distancia_km.errors %}<span class="error" role="alert" aria-live="polite">{{ form.distancia_km.errors }}</span>{% endif %}
                 </div>
                 
                 <div class="form-group">
-                    <label>Pagamento (€) *</label>
+                    <label for="id_pagamento_eur">Pagamento (€) *</label>
                     {{ form.pagamento_eur }}
-                    {% if form.pagamento_eur.errors %}<span class="error">{{ form.pagamento_eur.errors }}</span>{% endif %}
+                    {% if form.pagamento_eur.errors %}<span class="error" role="alert" aria-live="polite">{{ form.pagamento_eur.errors }}</span>{% endif %}
                 </div>
             </div>
         </fieldset>
@@ -82,24 +82,24 @@
             <legend>Detalhes da Viagem</legend>
             <div class="form-row">
                 <div class="form-group">
-                    <label>Combustível (litros)</label>
+                    <label for="id_combustivel_litros">Combustível (litros)</label>
                     {{ form.combustivel_litros }}
                 </div>
                 
                 <div class="form-group">
-                    <label>Tempo de Viagem (HH:MM:SS)</label>
+                    <label for="id_tempo_viagem">Tempo de Viagem (HH:MM:SS)</label>
                     {{ form.tempo_viagem }}
                 </div>
             </div>
             
             <div class="form-row">
                 <div class="form-group">
-                    <label>Dano (%)</label>
+                    <label for="id_dano_percentual">Dano (%)</label>
                     {{ form.dano_percentual }}
                 </div>
                 
                 <div class="form-group">
-                    <label>Multas (€)</label>
+                    <label for="id_multas">Multas (€)</label>
                     {{ form.multas }}
                 </div>
             </div>
@@ -108,17 +108,17 @@
         <fieldset>
             <legend>Status e Extras</legend>
             <div class="form-group">
-                <label>Status</label>
+                <label for="id_status">Status</label>
                 {{ form.status }}
             </div>
             
             <div class="form-group">
-                <label>Screenshot</label>
+                <label for="id_screenshot">Screenshot</label>
                 {{ form.screenshot }}
             </div>
             
             <div class="form-group">
-                <label>Notas</label>
+                <label for="id_notas">Notas</label>
                 {{ form.notas }}
             </div>
         </fieldset>

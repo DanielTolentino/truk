@@ -6,69 +6,69 @@
 {% block content %}
 <div class="dashboard">
     <h1>Dashboard</h1>
-    <p class="welcome">Bem-vindo, {{ user.get_full_name|default:user.username }}! 🚛</p>
+    <p class="welcome">Bem-vindo, {{ user.get_full_name|default:user.username }}! <span aria-label="Caminhão">🚿</span></p>
     
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-icon">📦</div>
+            <div class="stat-icon" aria-label="Pacotes">📦</div>
             <div class="stat-info">
-                <h3>{{ total_loads }}</h3>
+                <h2>{{ total_loads }}</h2>
                 <p>Total de Cargas</p>
             </div>
         </div>
         
         <div class="stat-card">
-            <div class="stat-icon">✅</div>
+            <div class="stat-icon" aria-label="Concluídas">✅</div>
             <div class="stat-info">
-                <h3>{{ completed_loads }}</h3>
+                <h2>{{ completed_loads }}</h2>
                 <p>Concluídas</p>
             </div>
         </div>
         
         <div class="stat-card">
-            <div class="stat-icon">🚚</div>
+            <div class="stat-icon" aria-label="Caminhão">🚚</div>
             <div class="stat-info">
-                <h3>{{ active_loads_count }}</h3>
+                <h2>{{ active_loads_count }}</h2>
                 <p>Em Andamento</p>
             </div>
         </div>
         
         <div class="stat-card">
-            <div class="stat-icon">🛣️</div>
+            <div class="stat-icon" aria-label="Rodovia">🛟️</div>
             <div class="stat-info">
-                <h3>{{ total_km|compact_number }} km</h3>
+                <h2>{{ total_km|compact_number }} km</h2>
                 <p>Distância Total</p>
             </div>
         </div>
         
         <div class="stat-card success">
-            <div class="stat-icon">💰</div>
+            <div class="stat-icon" aria-label="Dinheiro">💰</div>
             <div class="stat-info">
-                <h3>€{{ total_revenue|compact_number }}</h3>
+                <h2>€{{ total_revenue|compact_number }}</h2>
                 <p>Receita Total</p>
             </div>
         </div>
         
         <div class="stat-card warning">
-            <div class="stat-icon">⚠️</div>
+            <div class="stat-icon" aria-label="Aviso">⚠️</div>
             <div class="stat-info">
-                <h3>€{{ total_fines|compact_number }}</h3>
+                <h2>€{{ total_fines|compact_number }}</h2>
                 <p>Multas</p>
             </div>
         </div>
         
         <div class="stat-card info">
-            <div class="stat-icon">📊</div>
+            <div class="stat-icon" aria-label="Estatísticas">📊</div>
             <div class="stat-info">
-                <h3>€{{ net_revenue|compact_number }}</h3>
+                <h2>€{{ net_revenue|compact_number }}</h2>
                 <p>Lucro Líquido</p>
             </div>
         </div>
         
         <div class="stat-card">
-            <div class="stat-icon">⛽</div>
+            <div class="stat-icon" aria-label="Combustível">⛽</div>
             <div class="stat-info">
-                <h3>{{ total_fuel|compact_number }}L</h3>
+                <h2>{{ total_fuel|compact_number }}L</h2>
                 <p>Combustível</p>
             </div>
         </div>
@@ -108,11 +108,12 @@
     <div class="top-routes">
         <h2>Top Rotas</h2>
         <table class="table">
+            <caption class="sr-only">Top 5 rotas mais utilizadas</caption>
             <thead>
                 <tr>
-                    <th>Rota</th>
-                    <th>Entregas</th>
-                    <th>Receita Total</th>
+                    <th scope="col">Rota</th>
+                    <th scope="col">Entregas</th>
+                    <th scope="col">Receita Total</th>
                 </tr>
             </thead>
             <tbody>
