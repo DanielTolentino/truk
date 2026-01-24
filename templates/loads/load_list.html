@@ -12,6 +12,9 @@
         </p>
     </div>
     <div class="page-actions">
+        <a href="{% url 'loads:export_csv' %}?{{ querystring }}" class="btn btn-ghost" title="Exportar para CSV">
+            📥 Exportar CSV
+        </a>
         <a href="{% url 'loads:create' %}" class="btn btn-primary">
             <span>➕</span> Nova Carga
         </a>
@@ -21,10 +24,28 @@
 <!-- Filters Card -->
 <div class="card load-list-filters">
     <div class="card-body">
-        <form method="get" class="load-list-filter-form">
+        <form method="get" 
+              class="load-list-filter-form"
+              hx-get="{% url 'loads:list' %}"
+              hx-target="#loads-results"
+              hx-swap="innerHTML"
+              hx-trigger="submit, change from:select delay:300ms"
+              hx-push-url="true"
+              hx-indicator="#filter-loading">
             <div class="form-group load-list-filter-field">
                 <label for="search" class="form-label">Buscar</label>
-                <input type="text" name="search" id="search" placeholder="Buscar por rota, carga..." value="{{ filter_form.search.value|default_if_none:'' }}" class="form-input">
+                <input type="text" 
+                       name="search" 
+                       id="search" 
+                       placeholder="Buscar por rota, carga..." 
+                       value="{{ filter_form.search.value|default_if_none:'' }}" 
+                       class="form-input"
+                       hx-get="{% url 'loads:list' %}"
+                       hx-target="#loads-results"
+                       hx-swap="innerHTML"
+                       hx-trigger="keyup changed delay:500ms"
+                       hx-include="closest form"
+                       hx-push-url="true">
             </div>
             
             <div class="form-group load-list-filter-field">
@@ -76,7 +97,8 @@
             </div>
             
             <button type="submit" class="btn btn-primary load-list-filter-button">
-                🔍 Filtrar
+                <span id="filter-loading" class="htmx-indicator">⏳</span>
+                <span class="filter-btn-text">🔍 Filtrar</span>
             </button>
             
             {% if request.GET %}
@@ -88,115 +110,31 @@
     </div>
 </div>
 
-<!-- Loads Table -->
-{% if loads %}
-<div class="card load-list-table">
-    <div class="card-body">
-        <div class="table-container">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Status</th>
-                        <th scope="col">Rota</th>
-                        <th scope="col">Carga</th>
-                        <th scope="col">Distância</th>
-                        <th scope="col">Pagamento</th>
-                        <th scope="col">Dano</th>
-                        <th scope="col">Data</th>
-                        <th scope="col" class="text-center">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for load in loads %}
-                    <tr>
-                        <td>
-                            {% if load.status == 'concluida' %}
-                            <span class="badge badge-success">{{ load.get_status_display }}</span>
-                            {% elif load.status == 'em_andamento' %}
-                            <span class="badge badge-info">{{ load.get_status_display }}</span>
-                            {% elif load.status == 'pendente' %}
-                            <span class="badge badge-warning">{{ load.get_status_display }}</span>
-                            {% else %}
-                            <span class="badge badge-danger">{{ load.get_status_display }}</span>
-                            {% endif %}
-                        </td>
-                        <td><strong>{{ load.rota }}</strong></td>
-                        <td>{{ load.tipo_carga }}</td>
-                        <td>{{ load.distancia_km }} km</td>
-                        <td><strong style="color: var(--primary-500);">€{{ load.pagamento_eur }}</strong></td>
-                        <td>
-                            {% if load.dano_percentual < 5 %}
-                            <span class="badge badge-success">{{ load.dano_percentual }}%</span>
-                            {% elif load.dano_percentual < 10 %}
-                            <span class="badge badge-warning">{{ load.dano_percentual }}%</span>
-                            {% else %}
-                            <span class="badge badge-danger">{{ load.dano_percentual }}%</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ load.data_criacao|date:"d/m/Y" }}</td>
-                        <td>
-                            <div class="table-actions">
-                                <a href="{% url 'loads:detail' load.pk %}" class="btn btn-sm btn-ghost" title="Ver detalhes">
-                                    👁️
-                                </a>
-                                <a href="{% url 'loads:edit' load.pk %}" class="btn btn-sm btn-ghost" title="Editar">
-                                    ✏️
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+<!-- Loads Results (HTMX target) -->
+<div id="loads-results">
+    {% include 'loads/partials/load_table.html' %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Atualiza link de exportação quando filtros mudam
+    document.body.addEventListener('htmx:afterSwap', function(evt) {
+        if (evt.detail.target.id === 'loads-results') {
+            const exportLink = document.querySelector('a[href*="export_csv"]');
+            if (exportLink) {
+                const currentUrl = new URL(window.location.href);
+                currentUrl.pathname = '{% url "loads:export_csv" %}';
+                exportLink.href = currentUrl.toString();
+            }
+        }
+    });
     
-    <!-- Pagination -->
-    {% if is_paginated %}
-    <div class="card-footer">
-        <div class="table-pagination">
-            <div class="table-pagination-info">
-                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-            </div>
-            <div class="table-pagination-controls">
-                {% if page_obj.has_previous %}
-                <a href="?page=1{% if querystring %}&{{ querystring }}{% endif %}" class="pagination-btn">
-                    ⏮️ Primeira
-                </a>
-                <a href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}" class="pagination-btn">
-                    ← Anterior
-                </a>
-                {% endif %}
-                
-                <span class="pagination-btn active">{{ page_obj.number }}</span>
-                
-                {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}" class="pagination-btn">
-                    Próxima →
-                </a>
-                <a href="?page={{ page_obj.paginator.num_pages }}{% if querystring %}&{{ querystring }}{% endif %}" class="pagination-btn">
-                    Última ⏭️
-                </a>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-    {% endif %}
-</div>
-{% else %}
-<div class="empty-state">
-    <div class="empty-state-icon">📦</div>
-    <div class="empty-state-title">Nenhuma carga encontrada</div>
-    <div class="empty-state-text">
-        {% if request.GET.search or request.GET.status %}
-        Nenhuma carga corresponde aos filtros aplicados.
-        {% else %}
-        Você ainda não registrou nenhuma carga. Comece criando sua primeira!
-        {% endif %}
-    </div>
-    <a href="{% url 'loads:create' %}" class="btn btn-primary load-list-empty-action">
-        ➕ Criar Primeira Carga
-    </a>
-</div>
-{% endif %}
+    // Toast de feedback após ações
+    document.body.addEventListener('htmx:afterRequest', function(evt) {
+        if (evt.detail.successful && evt.detail.target.id === 'loads-results') {
+            // Opcionalmente mostrar toast de sucesso
+        }
+    });
+</script>
 {% endblock %}

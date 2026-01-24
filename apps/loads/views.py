@@ -1,12 +1,15 @@
+import csv
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.http import HttpResponseNotAllowed
+from django.views import View
+from django.http import HttpResponseNotAllowed, HttpResponse
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models import Q
 from django.http import JsonResponse
+from django.template.loader import render_to_string
 from .models import Load
 from .forms import LoadForm, LoadFilterForm
 
@@ -62,6 +65,108 @@ class LoadListView(LoginRequiredMixin, ListView):
         query_params.pop('page', None)
         context['querystring'] = query_params.urlencode()
         return context
+    
+    def get_template_names(self):
+        # Retorna template parcial para requisições HTMX
+        if self.request.headers.get('HX-Request'):
+            return ['loads/partials/load_table.html']
+        return [self.template_name]
+
+
+class LoadExportCSVView(LoginRequiredMixin, View):
+    """Exporta cargas para CSV respeitando os filtros aplicados."""
+    
+    def get(self, request):
+        qs = Load.objects.select_related('motorista')
+        
+        # Se não for admin, mostra apenas cargas do motorista
+        if not request.user.is_admin:
+            qs = qs.filter(motorista=request.user)
+        
+        # Aplica os mesmos filtros da listagem
+        filter_form = LoadFilterForm(request.GET)
+        if filter_form.is_valid():
+            data = filter_form.cleaned_data
+            if data.get('status'):
+                qs = qs.filter(status=data['status'])
+            if data.get('search'):
+                search = data['search']
+                qs = qs.filter(
+                    Q(origem_cidade__icontains=search) |
+                    Q(destino_cidade__icontains=search) |
+                    Q(tipo_carga__icontains=search) |
+                    Q(motorista__username__icontains=search)
+                )
+            if data.get('tipo_trailer'):
+                qs = qs.filter(tipo_trailer=data['tipo_trailer'])
+            if data.get('origem_pais'):
+                qs = qs.filter(origem_pais__icontains=data['origem_pais'])
+            if data.get('destino_pais'):
+                qs = qs.filter(destino_pais__icontains=data['destino_pais'])
+            if data.get('date_from'):
+                qs = qs.filter(data_criacao__date__gte=data['date_from'])
+            if data.get('date_to'):
+                qs = qs.filter(data_criacao__date__lte=data['date_to'])
+            if data.get('min_payment') is not None:
+                qs = qs.filter(pagamento_eur__gte=data['min_payment'])
+            if data.get('max_payment') is not None:
+                qs = qs.filter(pagamento_eur__lte=data['max_payment'])
+        
+        qs = qs.order_by('-data_criacao')
+        
+        # Cria resposta CSV
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="cargas_truk.csv"'
+        response.write('\ufeff')  # BOM para Excel reconhecer UTF-8
+        
+        writer = csv.writer(response, delimiter=';')
+        
+        # Cabeçalhos
+        writer.writerow([
+            'Data',
+            'Status',
+            'Motorista',
+            'Origem (Cidade)',
+            'Origem (País)',
+            'Destino (Cidade)',
+            'Destino (País)',
+            'Tipo de Carga',
+            'Tipo de Trailer',
+            'Distância (km)',
+            'Peso (ton)',
+            'Pagamento (€)',
+            'Multas (€)',
+            'Lucro Líquido (€)',
+            'Dano (%)',
+            'Combustível (L)',
+            'Tempo de Viagem',
+            'Notas'
+        ])
+        
+        # Dados
+        for load in qs:
+            writer.writerow([
+                load.data_criacao.strftime('%d/%m/%Y %H:%M'),
+                load.get_status_display(),
+                load.motorista.username,
+                load.origem_cidade,
+                load.origem_pais,
+                load.destino_cidade,
+                load.destino_pais,
+                load.tipo_carga,
+                load.get_tipo_trailer_display() if load.tipo_trailer else '',
+                str(load.distancia_km).replace('.', ','),
+                str(load.peso_toneladas).replace('.', ',') if load.peso_toneladas else '',
+                str(load.pagamento_eur).replace('.', ','),
+                str(load.multas).replace('.', ','),
+                str(load.lucro_liquido).replace('.', ','),
+                str(load.dano_percentual).replace('.', ','),
+                str(load.combustivel_litros).replace('.', ',') if load.combustivel_litros else '',
+                str(load.tempo_viagem) if load.tempo_viagem else '',
+                load.notas or ''
+            ])
+        
+        return response
 
 
 class LoadDetailView(LoginRequiredMixin, DetailView):
