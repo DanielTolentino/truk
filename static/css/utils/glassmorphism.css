@@ -1,0 +1,26 @@
+/* ============================================
+   GLASSMORPHISM UTILITIES
+   Reusable glass effect classes
+   ============================================ */
+
+/* Glass Background */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--blur-md);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-glass);
+}
+
+.glass-light {
+  background: var(--glass-bg-light);
+  backdrop-filter: var(--blur-sm);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-glass);
+}
+
+.glass-heavy {
+  background: var(--glass-bg);
+  backdrop-filter: var(--blur-lg);
+  border: 2px solid var(--glass-border);
+  box-shadow: var(--shadow-glass-lg);
+}

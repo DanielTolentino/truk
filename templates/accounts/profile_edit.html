@@ -3,42 +3,116 @@
 {% block title %}Editar Perfil - TruK{% endblock %}
 
 {% block content %}
-<div class="form-container">
-    <h1>Editar Perfil</h1>
-    
+<!-- Page Header -->
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Editar Perfil</h1>
+        <p class="text-secondary" style="margin-top: var(--space-2);">
+            Atualize suas informações pessoais
+        </p>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'accounts:profile' %}" class="btn btn-ghost">
+            ← Voltar ao Perfil
+        </a>
+    </div>
+</div>
+
+<!-- Form Card -->
+<div class="card" style="max-width: 800px; margin: 0 auto;">
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {% load widget_tweaks %}
         
-        <div class="form-group">
-            <label>Nome</label>
-            {{ form.first_name|add_class:"form-control" }}
+        <div class="card-body">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="id_first_name" class="form-label">Nome</label>
+                    <input type="text" name="first_name" id="id_first_name" value="{{ form.first_name.value|default:'' }}" class="form-input" placeholder="Seu nome">
+                    {% if form.first_name.errors %}
+                    <span class="form-text is-invalid">{{ form.first_name.errors.0 }}</span>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_last_name" class="form-label">Sobrenome</label>
+                    <input type="text" name="last_name" id="id_last_name" value="{{ form.last_name.value|default:'' }}" class="form-input" placeholder="Seu sobrenome">
+                    {% if form.last_name.errors %}
+                    <span class="form-text is-invalid">{{ form.last_name.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="id_email" class="form-label required">Email</label>
+                <div class="form-input-icon">
+                    <span class="icon">📧</span>
+                    <input type="email" name="email" id="id_email" value="{{ form.email.value|default:'' }}" class="form-input" placeholder="seu@email.com" required style="padding-left: var(--space-10);">
+                </div>
+                {% if form.email.errors %}
+                <span class="form-text is-invalid">{{ form.email.errors.0 }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_avatar" class="form-label">Avatar</label>
+                <input type="file" name="avatar" id="id_avatar" class="form-input" accept="image/*">
+                <span class="form-text">Faça upload de uma imagem para seu avatar (opcional)</span>
+                {% if form.avatar.errors %}
+                <span class="form-text is-invalid">{{ form.avatar.errors.0 }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_bio" class="form-label">Bio</label>
+                <textarea name="bio" id="id_bio" class="form-textarea" rows="5" placeholder="Conte um pouco sobre você...">{{ form.bio.value|default:'' }}</textarea>
+                <span class="form-text">Uma breve descrição sobre você</span>
+                {% if form.bio.errors %}
+                <span class="form-text is-invalid">{{ form.bio.errors.0 }}</span>
+                {% endif %}
+            </div>
         </div>
         
-        <div class="form-group">
-            <label>Sobrenome</label>
-            {{ form.last_name|add_class:"form-control" }}
-        </div>
-        
-        <div class="form-group">
-            <label>Email</label>
-            {{ form.email|add_class:"form-control" }}
-        </div>
-        
-        <div class="form-group">
-            <label>Avatar</label>
-            {{ form.avatar|add_class:"form-control" }}
-        </div>
-        
-        <div class="form-group">
-            <label>Bio</label>
-            {{ form.bio|add_class:"form-control" }}
-        </div>
-        
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Salvar</button>
-            <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">Cancelar</a>
+        <div class="card-footer" style="display: flex; gap: var(--space-3); justify-content: flex-end;">
+            <a href="{% url 'accounts:profile' %}" class="btn btn-ghost">
+                Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary">
+                ✓ Salvar Alterações
+            </button>
         </div>
     </form>
 </div>
+
+<style>
+/* Form widget styling for profile edit */
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-base);
+    font-family: inherit;
+    color: var(--text-primary);
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur-sm);
+    border: 2px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-normal);
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--primary-500);
+    background: var(--glass-bg-hover);
+    box-shadow: 0 0 0 3px var(--primary-500-alpha);
+}
+
+.form-textarea {
+    resize: vertical;
+}
+
+input[type="file"].form-input {
+    padding: var(--space-2);
+}
+</style>
 {% endblock %}

@@ -3,133 +3,232 @@
 {% block title %}{{ load }} - TruK{% endblock %}
 
 {% block content %}
-<div class="load-detail">
-    <div class="page-header">
-        <h1>Detalhes da Carga</h1>
-        <div class="actions">
-            <a href="{% url 'loads:edit' load.pk %}" class="btn btn-secondary">Editar</a>
-            <a href="{% url 'loads:delete' load.pk %}" class="btn btn-danger">Deletar</a>
+<!-- Page Header -->
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Detalhes da Carga</h1>
+        <p class="text-secondary" style="margin-top: var(--space-2);">
+            {{ load.rota }}
+        </p>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'loads:edit' load.pk %}" class="btn btn-secondary">
+            ✏️ Editar
+        </a>
+        <a href="{% url 'loads:delete' load.pk %}" class="btn btn-danger">
+            🗑️ Deletar
+        </a>
+    </div>
+</div>
+
+<!-- Status Card -->
+<div class="card" style="margin-bottom: var(--space-6);">
+    <div class="card-body" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-4);">
+        <div style="display: flex; align-items: center; gap: var(--space-4);">
+            <span style="font-size: var(--text-lg); font-weight: 600;">Status:</span>
+            {% if load.status == 'concluida' %}
+            <span class="badge badge-success" style="font-size: var(--text-base); padding: var(--space-2) var(--space-4);">✓ {{ load.get_status_display }}</span>
+            {% elif load.status == 'em_andamento' %}
+            <span class="badge badge-info" style="font-size: var(--text-base); padding: var(--space-2) var(--space-4);">🚚 {{ load.get_status_display }}</span>
+            {% elif load.status == 'pendente' %}
+            <span class="badge badge-warning" style="font-size: var(--text-base); padding: var(--space-2) var(--space-4);">⏳ {{ load.get_status_display }}</span>
+            {% else %}
+            <span class="badge badge-danger" style="font-size: var(--text-base); padding: var(--space-2) var(--space-4);">✕ {{ load.get_status_display }}</span>
+            {% endif %}
+        </div>
+        
+        <div style="display: flex; gap: var(--space-2);">
+            {% if load.status == 'pendente' %}
+            <a href="{% url 'loads:status_change' load.pk 'iniciar' %}" class="btn btn-primary">▶️ Iniciar Carga</a>
+            {% elif load.status == 'em_andamento' %}
+            <a href="{% url 'loads:status_change' load.pk 'concluir' %}" class="btn btn-success">✓ Concluir</a>
+            <a href="{% url 'loads:status_change' load.pk 'falhar' %}" class="btn btn-warning">✕ Marcar como Falhada</a>
+            {% endif %}
         </div>
     </div>
-    
-    <div class="status-section">
-        <span class="status-badge status-{{ load.status }} large">{{ load.get_status_display }}</span>
-        
-        {% if load.status == 'pendente' %}
-        <a href="{% url 'loads:status_change' load.pk 'iniciar' %}" class="btn btn-primary">Iniciar Carga</a>
-        {% elif load.status == 'em_andamento' %}
-        <a href="{% url 'loads:status_change' load.pk 'concluir' %}" class="btn btn-success">Concluir</a>
-        <a href="{% url 'loads:status_change' load.pk 'falhar' %}" class="btn btn-warning">Marcar como Falhada</a>
-        {% endif %}
-    </div>
-    
-    <div class="detail-grid">
-        <div class="detail-card">
-            <h2>Rota</h2>
-            <div class="route-info">
-                <div class="location">
-                    <strong>📍 Origem:</strong>
-                    <p>{{ load.origem_cidade }}, {{ load.origem_pais }}</p>
+</div>
+
+<!-- Main Grid -->
+<div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-6); margin-bottom: var(--space-6);">
+    <!-- Rota Card -->
+    <div class="card hover-lift">
+        <div class="card-header">
+            <h2 class="card-title">📍 Rota</h2>
+        </div>
+        <div class="card-body">
+            <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+                <div>
+                    <strong style="color: var(--text-secondary); font-size: var(--text-sm); display: block; margin-bottom: var(--space-1);">Origem</strong>
+                    <p style="font-size: var(--text-lg); font-weight: 600; color: var(--text-primary); margin: 0;">
+                        {{ load.origem_cidade }}, {{ load.origem_pais }}
+                    </p>
                 </div>
-                <div class="arrow">→</div>
-                <div class="location">
-                    <strong>🎯 Destino:</strong>
-                    <p>{{ load.destino_cidade }}, {{ load.destino_pais }}</p>
+                <div style="text-align: center; font-size: 2rem; color: var(--primary-500);">
+                    →
+                </div>
+                <div>
+                    <strong style="color: var(--text-secondary); font-size: var(--text-sm); display: block; margin-bottom: var(--space-1);">Destino</strong>
+                    <p style="font-size: var(--text-lg); font-weight: 600; color: var(--text-primary); margin: 0;">
+                        {{ load.destino_cidade }}, {{ load.destino_pais }}
+                    </p>
                 </div>
             </div>
         </div>
-        
-        <div class="detail-card">
-            <h2>Informações da Carga</h2>
-            <dl>
-                <dt>Tipo de Carga:</dt>
-                <dd>{{ load.tipo_carga }}</dd>
-                
-                <dt>Tipo de Trailer:</dt>
-                <dd>{{ load.get_tipo_trailer_display|default:"N/A" }}</dd>
-                
+    </div>
+    
+    <!-- Informações da Carga -->
+    <div class="card hover-lift">
+        <div class="card-header">
+            <h2 class="card-title">📦 Informações da Carga</h2>
+        </div>
+        <div class="card-body">
+            <dl style="display: grid; gap: var(--space-3); margin: 0;">
+                <div>
+                    <dt style="color: var(--text-secondary); font-size: var(--text-sm); margin-bottom: var(--space-1);">Tipo de Carga</dt>
+                    <dd style="font-weight: 600; margin: 0;">{{ load.tipo_carga }}</dd>
+                </div>
+                <div>
+                    <dt style="color: var(--text-secondary); font-size: var(--text-sm); margin-bottom: var(--space-1);">Tipo de Trailer</dt>
+                    <dd style="font-weight: 600; margin: 0;">{{ load.get_tipo_trailer_display|default:"N/A" }}</dd>
+                </div>
                 {% if load.peso_toneladas %}
-                <dt>Peso:</dt>
-                <dd>{{ load.peso_toneladas }} toneladas</dd>
+                <div>
+                    <dt style="color: var(--text-secondary); font-size: var(--text-sm); margin-bottom: var(--space-1);">Peso</dt>
+                    <dd style="font-weight: 600; margin: 0;">{{ load.peso_toneladas }} toneladas</dd>
+                </div>
                 {% endif %}
-                
-                <dt>Distância:</dt>
-                <dd>{{ load.distancia_km }} km</dd>
+                <div>
+                    <dt style="color: var(--text-secondary); font-size: var(--text-sm); margin-bottom: var(--space-1);">Distância</dt>
+                    <dd style="font-weight: 600; margin: 0;">{{ load.distancia_km }} km</dd>
+                </div>
             </dl>
         </div>
-        
-        <div class="detail-card">
-            <h2>Financeiro</h2>
-            <dl>
-                <dt>Pagamento:</dt>
-                <dd class="highlight-success">€{{ load.pagamento_eur }}</dd>
-                
-                <dt>Multas:</dt>
-                <dd class="highlight-danger">€{{ load.multas }}</dd>
-                
-                <dt>Lucro Líquido:</dt>
-                <dd class="highlight-info"><strong>€{{ load.lucro_liquido }}</strong></dd>
+    </div>
+    
+    <!-- Financeiro -->
+    <div class="card hover-lift">
+        <div class="card-header">
+            <h2 class="card-title">💰 Financeiro</h2>
+        </div>
+        <div class="card-body">
+            <dl style="display: grid; gap: var(--space-3); margin: 0;">
+                <div>
+                    <dt style="color: var(--text-secondary); font-size: var(--text-sm); margin-bottom: var(--space-1);">Pagamento</dt>
+                    <dd style="font-weight: 700; font-size: var(--text-xl); color: #10b981; margin: 0;">€{{ load.pagamento_eur }}</dd>
+                </div>
+                <div>
+                    <dt style="color: var(--text-secondary); font-size: var(--text-sm); margin-bottom: var(--space-1);">Multas</dt>
+                    <dd style="font-weight: 700; font-size: var(--text-xl); color: #ef4444; margin: 0;">€{{ load.multas }}</dd>
+                </div>
+                <div style="padding-top: var(--space-3); border-top: 2px solid var(--glass-border);">
+                    <dt style="color: var(--text-secondary); font-size: var(--text-sm); margin-bottom: var(--space-1);">Lucro Líquido</dt>
+                    <dd style="font-weight: 800; font-size: var(--text-2xl); color: var(--primary-500); margin: 0;">€{{ load.lucro_liquido }}</dd>
+                </div>
             </dl>
         </div>
-        
-        <div class="detail-card">
-            <h2>Detalhes Técnicos</h2>
-            <dl>
-                <dt>Dano:</dt>
-                <dd>{{ load.dano_percentual }}%</dd>
-                
-                <dt>Eficiência:</dt>
-                <dd>{{ load.eficiencia }}%</dd>
-                
+    </div>
+    
+    <!-- Detalhes Técnicos -->
+    <div class="card hover-lift">
+        <div class="card-header">
+            <h2 class="card-title">⚙️ Detalhes Técnicos</h2>
+        </div>
+        <div class="card-body">
+            <dl style="display: grid; gap: var(--space-3); margin: 0;">
+                <div>
+                    <dt style="color: var(--text-secondary); font-size: var(--text-sm); margin-bottom: var(--space-1);">Dano</dt>
+                    <dd style="margin: 0;">
+                        {% if load.dano_percentual < 5 %}
+                        <span class="badge badge-success">{{ load.dano_percentual }}%</span>
+                        {% elif load.dano_percentual < 10 %}
+                        <span class="badge badge-warning">{{ load.dano_percentual }}%</span>
+                        {% else %}
+                        <span class="badge badge-danger">{{ load.dano_percentual }}%</span>
+                        {% endif %}
+                    </dd>
+                </div>
+                <div>
+                    <dt style="color: var(--text-secondary); font-size: var(--text-sm); margin-bottom: var(--space-1);">Eficiência</dt>
+                    <dd style="font-weight: 600; margin: 0;">{{ load.eficiencia }}%</dd>
+                </div>
                 {% if load.combustivel_litros %}
-                <dt>Combustível:</dt>
-                <dd>{{ load.combustivel_litros }} litros</dd>
+                <div>
+                    <dt style="color: var(--text-secondary); font-size: var(--text-sm); margin-bottom: var(--space-1);">Combustível</dt>
+                    <dd style="font-weight: 600; margin: 0;">{{ load.combustivel_litros }} litros</dd>
+                </div>
                 {% endif %}
-                
                 {% if load.tempo_viagem %}
-                <dt>Tempo de Viagem:</dt>
-                <dd>{{ load.tempo_viagem }}</dd>
+                <div>
+                    <dt style="color: var(--text-secondary); font-size: var(--text-sm); margin-bottom: var(--space-1);">Tempo de Viagem</dt>
+                    <dd style="font-weight: 600; margin: 0;">{{ load.tempo_viagem }}</dd>
+                </div>
                 {% endif %}
             </dl>
         </div>
-        
-        <div class="detail-card">
-            <h2>Datas</h2>
-            <dl>
-                <dt>Criado em:</dt>
-                <dd>{{ load.data_criacao|date:"d/m/Y H:i" }}</dd>
-                
+    </div>
+    
+    <!-- Datas -->
+    <div class="card hover-lift">
+        <div class="card-header">
+            <h2 class="card-title">📅 Datas</h2>
+        </div>
+        <div class="card-body">
+            <dl style="display: grid; gap: var(--space-3); margin: 0;">
+                <div>
+                    <dt style="color: var(--text-secondary); font-size: var(--text-sm); margin-bottom: var(--space-1);">Criado em</dt>
+                    <dd style="font-weight: 600; margin: 0;">{{ load.data_criacao|date:"d/m/Y H:i" }}</dd>
+                </div>
                 {% if load.data_inicio %}
-                <dt>Iniciado em:</dt>
-                <dd>{{ load.data_inicio|date:"d/m/Y H:i" }}</dd>
+                <div>
+                    <dt style="color: var(--text-secondary); font-size: var(--text-sm); margin-bottom: var(--space-1);">Iniciado em</dt>
+                    <dd style="font-weight: 600; margin: 0;">{{ load.data_inicio|date:"d/m/Y H:i" }}</dd>
+                </div>
                 {% endif %}
-                
                 {% if load.data_conclusao %}
-                <dt>Concluído em:</dt>
-                <dd>{{ load.data_conclusao|date:"d/m/Y H:i" }}</dd>
+                <div>
+                    <dt style="color: var(--text-secondary); font-size: var(--text-sm); margin-bottom: var(--space-1);">Concluído em</dt>
+                    <dd style="font-weight: 600; margin: 0;">{{ load.data_conclusao|date:"d/m/Y H:i" }}</dd>
+                </div>
                 {% endif %}
             </dl>
         </div>
-        
-        <div class="detail-card">
-            <h2>Motorista</h2>
-            <p><strong>{{ load.motorista.get_full_name|default:load.motorista.username }}</strong></p>
-            <p class="role-badge">{{ load.motorista.get_role_display }}</p>
+    </div>
+    
+    <!-- Motorista -->
+    <div class="card hover-lift">
+        <div class="card-header">
+            <h2 class="card-title">👤 Motorista</h2>
+        </div>
+        <div class="card-body" style="text-align: center;">
+            <p style="font-size: var(--text-xl); font-weight: 700; margin-bottom: var(--space-2);">
+                {{ load.motorista.get_full_name|default:load.motorista.username }}
+            </p>
+            <span class="badge badge-primary">{{ load.motorista.get_role_display }}</span>
         </div>
     </div>
-    
-    {% if load.screenshot %}
-    <div class="screenshot-section">
-        <h2>Screenshot</h2>
-        <img src="{{ load.screenshot.url }}" alt="Screenshot da carga" class="screenshot-img">
-    </div>
-    {% endif %}
-    
-    {% if load.notas %}
-    <div class="notes-section">
-        <h2>Notas</h2>
-        <p>{{ load.notas|linebreaks }}</p>
-    </div>
-    {% endif %}
 </div>
+
+<!-- Screenshot -->
+{% if load.screenshot %}
+<div class="card" style="margin-bottom: var(--space-6);">
+    <div class="card-header">
+        <h2 class="card-title">📸 Screenshot</h2>
+    </div>
+    <div class="card-body">
+        <img src="{{ load.screenshot.url }}" alt="Screenshot da carga" style="width: 100%; height: auto; border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+    </div>
+</div>
+{% endif %}
+
+<!-- Notas -->
+{% if load.notas %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">📝 Notas</h2>
+    </div>
+    <div class="card-body">
+        <p style="white-space: pre-line; margin: 0;">{{ load.notas }}</p>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

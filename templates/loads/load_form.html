@@ -3,130 +3,182 @@
 {% block title %}{% if object %}Editar{% else %}Nova{% endif %} Carga - TruK{% endblock %}
 
 {% block content %}
-<div class="form-container">
-    <h1>{% if object %}Editar Carga{% else %}Registrar Nova Carga{% endif %}</h1>
-    
-    <form method="post" enctype="multipart/form-data" class="load-form" aria-label="Formulário de carga">
+<!-- Page Header -->
+<div class="page-header">
+    <div>
+        <h1 class="page-title">{% if object %}Editar Carga{% else %}Registrar Nova Carga{% endif %}</h1>
+        <p class="text-secondary" style="margin-top: var(--space-2);">
+            Preencha os dados da carga abaixo
+        </p>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'loads:list' %}" class="btn btn-ghost">
+            ← Voltar
+        </a>
+    </div>
+</div>
+
+<!-- Form Card -->
+<div class="card">
+    <form method="post" enctype="multipart/form-data" class="load-form">
         {% csrf_token %}
         
-        <fieldset>
-            <legend>Origem e Destino</legend>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="id_origem_cidade">Cidade de Origem *</label>
-                    {{ form.origem_cidade }}
-                    {% if form.origem_cidade.errors %}<span class="error" role="alert" aria-live="polite">{{ form.origem_cidade.errors }}</span>{% endif %}
+        <div class="card-body">
+            <!-- Origem e Destino -->
+            <div class="form-fieldset">
+                <legend>📍 Origem e Destino</legend>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.origem_cidade.id_for_label }}" class="form-label required">Cidade de Origem</label>
+                        {{ form.origem_cidade }}
+                        {% if form.origem_cidade.errors %}
+                        <span class="form-text is-invalid">{{ form.origem_cidade.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.origem_pais.id_for_label }}" class="form-label required">País de Origem</label>
+                        {{ form.origem_pais }}
+                        {% if form.origem_pais.errors %}
+                        <span class="form-text is-invalid">{{ form.origem_pais.errors.0 }}</span>
+                        {% endif %}
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="id_origem_pais">País de Origem *</label>
-                    {{ form.origem_pais }}
-                    {% if form.origem_pais.errors %}<span class="error" role="alert" aria-live="polite">{{ form.origem_pais.errors }}</span>{% endif %}
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.destino_cidade.id_for_label }}" class="form-label required">Cidade de Destino</label>
+                        {{ form.destino_cidade }}
+                        {% if form.destino_cidade.errors %}
+                        <span class="form-text is-invalid">{{ form.destino_cidade.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.destino_pais.id_for_label }}" class="form-label required">País de Destino</label>
+                        {{ form.destino_pais }}
+                        {% if form.destino_pais.errors %}
+                        <span class="form-text is-invalid">{{ form.destino_pais.errors.0 }}</span>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
             
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="id_destino_cidade">Cidade de Destino *</label>
-                    {{ form.destino_cidade }}
-                    {% if form.destino_cidade.errors %}<span class="error" role="alert" aria-live="polite">{{ form.destino_cidade.errors }}</span>{% endif %}
+            <!-- Informações da Carga -->
+            <div class="form-fieldset">
+                <legend>📦 Informações da Carga</legend>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.tipo_carga.id_for_label }}" class="form-label required">Tipo de Carga</label>
+                        {{ form.tipo_carga }}
+                        {% if form.tipo_carga.errors %}
+                        <span class="form-text is-invalid">{{ form.tipo_carga.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.tipo_trailer.id_for_label }}" class="form-label">Tipo de Trailer</label>
+                        {{ form.tipo_trailer }}
+                    </div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="id_destino_pais">País de Destino *</label>
-                    {{ form.destino_pais }}
-                    {% if form.destino_pais.errors %}<span class="error" role="alert" aria-live="polite">{{ form.destino_pais.errors }}</span>{% endif %}
-                </div>
-            </div>
-        </fieldset>
-        
-        <fieldset>
-            <legend>Informações da Carga</legend>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="id_tipo_carga">Tipo de Carga *</label>
-                    {{ form.tipo_carga }}
-                    {% if form.tipo_carga.errors %}<span class="error" role="alert" aria-live="polite">{{ form.tipo_carga.errors }}</span>{% endif %}
-                </div>
-                
-                <div class="form-group">
-                    <label for="id_tipo_trailer">Tipo de Trailer</label>
-                    {{ form.tipo_trailer }}
+                    <label for="{{ form.peso_toneladas.id_for_label }}" class="form-label">Peso (toneladas)</label>
+                    {{ form.peso_toneladas }}
                 </div>
             </div>
             
-            <div class="form-group">
-                <label for="id_peso_toneladas">Peso (toneladas)</label>
-                {{ form.peso_toneladas }}
-            </div>
-        </fieldset>
-        
-        <fieldset>
-            <legend>Distância e Pagamento</legend>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="id_distancia_km">Distância (km) *</label>
-                    {{ form.distancia_km }}
-                    {% if form.distancia_km.errors %}<span class="error" role="alert" aria-live="polite">{{ form.distancia_km.errors }}</span>{% endif %}
-                </div>
+            <!-- Distância e Pagamento -->
+            <div class="form-fieldset">
+                <legend>💰 Distância e Pagamento</legend>
                 
-                <div class="form-group">
-                    <label for="id_pagamento_eur">Pagamento (€) *</label>
-                    {{ form.pagamento_eur }}
-                    {% if form.pagamento_eur.errors %}<span class="error" role="alert" aria-live="polite">{{ form.pagamento_eur.errors }}</span>{% endif %}
-                </div>
-            </div>
-        </fieldset>
-        
-        <fieldset>
-            <legend>Detalhes da Viagem</legend>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="id_combustivel_litros">Combustível (litros)</label>
-                    {{ form.combustivel_litros }}
-                </div>
-                
-                <div class="form-group">
-                    <label for="id_tempo_viagem">Tempo de Viagem (HH:MM:SS)</label>
-                    {{ form.tempo_viagem }}
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.distancia_km.id_for_label }}" class="form-label required">Distância (km)</label>
+                        {{ form.distancia_km }}
+                        {% if form.distancia_km.errors %}
+                        <span class="form-text is-invalid">{{ form.distancia_km.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.pagamento_eur.id_for_label }}" class="form-label required">Pagamento (€)</label>
+                        {{ form.pagamento_eur }}
+                        {% if form.pagamento_eur.errors %}
+                        <span class="form-text is-invalid">{{ form.pagamento_eur.errors.0 }}</span>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
             
-            <div class="form-row">
+            <!-- Detalhes da Viagem -->
+            <div class="form-fieldset">
+                <legend>🚚 Detalhes da Viagem</legend>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.combustivel_litros.id_for_label }}" class="form-label">Combustível (litros)</label>
+                        {{ form.combustivel_litros }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.tempo_viagem.id_for_label }}" class="form-label">Tempo de Viagem (HH:MM:SS)</label>
+                        {{ form.tempo_viagem }}
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.dano_percentual.id_for_label }}" class="form-label">Dano (%)</label>
+                        {{ form.dano_percentual }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.multas.id_for_label }}" class="form-label">Multas (€)</label>
+                        {{ form.multas }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Status e Extras -->
+            <div class="form-fieldset">
+                <legend>⚙️ Status e Extras</legend>
+                
                 <div class="form-group">
-                    <label for="id_dano_percentual">Dano (%)</label>
-                    {{ form.dano_percentual }}
+                    <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                    {{ form.status }}
                 </div>
                 
                 <div class="form-group">
-                    <label for="id_multas">Multas (€)</label>
-                    {{ form.multas }}
+                    <label for="{{ form.screenshot.id_for_label }}" class="form-label">Screenshot</label>
+                    {{ form.screenshot }}
+                    <span class="form-text">Faça upload de uma captura de tela da carga (opcional)</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.notas.id_for_label }}" class="form-label">Notas</label>
+                    {{ form.notas }}
                 </div>
             </div>
-        </fieldset>
+        </div>
         
-        <fieldset>
-            <legend>Status e Extras</legend>
-            <div class="form-group">
-                <label for="id_status">Status</label>
-                {{ form.status }}
-            </div>
-            
-            <div class="form-group">
-                <label for="id_screenshot">Screenshot</label>
-                {{ form.screenshot }}
-            </div>
-            
-            <div class="form-group">
-                <label for="id_notas">Notas</label>
-                {{ form.notas }}
-            </div>
-        </fieldset>
-        
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">{% if object %}Atualizar{% else %}Registrar{% endif %}</button>
-            <a href="{% url 'loads:list' %}" class="btn btn-secondary">Cancelar</a>
+        <div class="card-footer" style="display: flex; gap: var(--space-3); justify-content: flex-end;">
+            <a href="{% url 'loads:list' %}" class="btn btn-ghost">
+                Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary">
+                {% if object %}✓ Atualizar Carga{% else %}✓ Registrar Carga{% endif %}
+            </button>
         </div>
     </form>
 </div>
-{% endblock %}
+
+<style>
+/* Form widget styling */
+.load-form input[type="text"],
+.load-form input[type="number"],
+.load-form input[type="file"],
+.load-form select,
+.load-form tex
