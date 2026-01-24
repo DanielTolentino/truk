@@ -4,42 +4,55 @@
 
 {% block content %}
 <div class="auth-container">
-    <div class="auth-box">
-        <h1 class="text-center"><span aria-label="Caminhão">🚚</span> TruK</h1>
-        <h2 class="text-center">Login</h2>
+    <div class="auth-card">
+        <!-- Auth Header -->
+        <div class="auth-header">
+            <div class="auth-logo">🚚</div>
+            <h1 class="auth-title">TruK</h1>
+            <p class="auth-subtitle">Bem-vindo de volta!</p>
+        </div>
         
-        <form method="post" aria-label="Formulário de login">
+        <!-- Login Form -->
+        <form method="post">
             {% csrf_token %}
-            {% load widget_tweaks %}
             
             <div class="form-group">
-                <label for="id_username">Username</label>
-                {{ form.username }}
+                <label for="id_username" class="form-label">Username</label>
+                <div class="form-input-icon">
+                    <span class="icon">👤</span>
+                    <input type="text" name="username" id="id_username" class="form-input" placeholder="Digite seu username" required autofocus style="padding-left: var(--space-10);">
+                </div>
                 {% if form.username.errors %}
-                    <span class="error" role="alert" aria-live="polite">{{ form.username.errors }}</span>
+                <span class="form-text is-invalid">{{ form.username.errors.0 }}</span>
                 {% endif %}
             </div>
             
             <div class="form-group">
-                <label for="id_password">Password</label>
-                {{ form.password }}
+                <label for="id_password" class="form-label">Password</label>
+                <div class="form-input-icon">
+                    <span class="icon">🔒</span>
+                    <input type="password" name="password" id="id_password" class="form-input" placeholder="Digite sua senha" required style="padding-left: var(--space-10);">
+                </div>
                 {% if form.password.errors %}
-                    <span class="error" role="alert" aria-live="polite">{{ form.password.errors }}</span>
+                <span class="form-text is-invalid">{{ form.password.errors.0 }}</span>
                 {% endif %}
             </div>
             
             {% if form.non_field_errors %}
-                <div class="alert alert-error" role="alert">
-                    {{ form.non_field_errors }}
-                </div>
+            <div style="padding: var(--space-3); background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; border-radius: var(--radius-lg); margin-bottom: var(--space-4);">
+                <p style="color: #ef4444; font-weight: 600; margin: 0;">{{ form.non_field_errors.0 }}</p>
+            </div>
             {% endif %}
             
-            <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+            <button type="submit" class="btn btn-primary btn-block">
+                🚪 Entrar
+            </button>
         </form>
         
-        <p class="text-center mt-3">
-            Não tem conta? <a href="{% url 'accounts:register' %}">Registre-se</a>
-        </p>
+        <!-- Auth Footer -->
+        <div class="auth-footer">
+            Não tem conta? <a href="{% url 'accounts:register' %}">Registre-se aqui</a>
+        </div>
     </div>
 </div>
 {% endblock %}

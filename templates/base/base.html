@@ -5,70 +5,184 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}TruK - Virtual Trucking Company{% endblock %}</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    <!-- Modern Design System CSS -->
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    
+    <!-- Chart.js for modern charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+    
+    <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    <!-- Skip Navigation Link (Accessibility) -->
     <a href="#main-content" class="skip-link">Pular para o conteúdo principal</a>
-    <nav class="navbar" role="navigation" aria-label="Navegação principal">
-        <div class="container">
-            <div class="navbar-brand">
-                <a href="{% url 'dashboard:home' %}" aria-label="TruK - Página inicial">
-                    <span class="logo" aria-hidden="true">🚚</span>
-                    <span class="logo">TruK</span>
-                </a>
+    
+    <div class="app-container">
+        {% if user.is_authenticated %}
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" role="navigation" aria-label="Navegação principal">
+            <!-- Sidebar Header -->
+            <div class="sidebar-header">
+                <span class="sidebar-logo" aria-label="TruK Logo">🚚</span>
+                <h1 class="sidebar-title">TruK</h1>
             </div>
-            {% if user.is_authenticated %}
-            <ul class="navbar-menu">
-                <li><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
-                <li><a href="{% url 'loads:list' %}">Minhas Cargas</a></li>
-                <li><a href="{% url 'loads:create' %}" class="btn-primary">+ Nova Carga</a></li>
-                <li><a href="{% url 'dashboard:analytics' %}">Analytics</a></li>
+            
+            <!-- Sidebar Menu -->
+            <nav class="sidebar-menu">
+                <a href="{% url 'dashboard:home' %}" class="sidebar-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                    <span class="sidebar-icon" aria-hidden="true">📊</span>
+                    <span class="sidebar-label">Dashboard</span>
+                </a>
+                
+                <a href="{% url 'loads:list' %}" class="sidebar-item {% if request.resolver_match.app_name == 'loads' and request.resolver_match.url_name != 'create' %}active{% endif %}">
+                    <span class="sidebar-icon" aria-hidden="true">🚛</span>
+                    <span class="sidebar-label">Minhas Cargas</span>
+                </a>
+                
+                <a href="{% url 'loads:create' %}" class="sidebar-item {% if request.resolver_match.app_name == 'loads' and request.resolver_match.url_name == 'create' %}active{% endif %}">
+                    <span class="sidebar-icon" aria-hidden="true">➕</span>
+                    <span class="sidebar-label">Nova Carga</span>
+                </a>
+                
+                <a href="{% url 'dashboard:analytics' %}" class="sidebar-item {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}">
+                    <span class="sidebar-icon" aria-hidden="true">📈</span>
+                    <span class="sidebar-label">Analytics</span>
+                </a>
+                
                 {% if user.is_admin %}
-                <li><a href="{% url 'admin:index' %}">Admin</a></li>
+                <a href="{% url 'admin:index' %}" class="sidebar-item">
+                    <span class="sidebar-icon" aria-hidden="true">⚙️</span>
+                    <span class="sidebar-label">Admin</span>
+                </a>
                 {% endif %}
-                <li class="dropdown">
-                    <button class="user-menu" aria-expanded="false" aria-haspopup="true" id="user-menu-button">
-                        {{ user.username }}
-                        <span aria-hidden="true"> ▼</span>
+                
+                <div style="margin-top: auto; padding-top: 2rem;">
+                    <a href="{% url 'accounts:profile' %}" class="sidebar-item">
+                        <span class="sidebar-icon" aria-hidden="true">👤</span>
+                        <span class="sidebar-label">Perfil</span>
+                    </a>
+                    
+                    <a href="{% url 'accounts:logout' %}" class="sidebar-item">
+                        <span class="sidebar-icon" aria-hidden="true">🚪</span>
+                        <span class="sidebar-label">Sair</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+        {% endif %}
+        
+        <!-- Main Content Wrapper -->
+        <div class="main-wrapper">
+            {% if user.is_authenticated %}
+            <!-- Top Bar -->
+            <header class="topbar">
+                <!-- Sidebar Toggle (Mobile) -->
+                <button id="sidebar-toggle" class="btn" aria-label="Toggle sidebar" style="display: none;">
+                    <span aria-hidden="true">☰</span>
+                </button>
+                
+                <!-- Search Bar -->
+                <div class="topbar-search">
+                    <input 
+                        type="search" 
+                        placeholder="Buscar cargas, rotas... (Ctrl+K)" 
+                        aria-label="Buscar"
+                        id="global-search"
+                    >
+                </div>
+                
+                <!-- Topbar Actions -->
+                <div class="topbar-actions">
+                    <!-- Dark Mode Toggle -->
+                    <button 
+                        id="theme-toggle" 
+                        aria-label="Alternar tema"
+                        title="Tema"
+                    >
+                        🌙
                     </button>
-                    <ul class="dropdown-menu" role="menu" aria-labelledby="user-menu-button">
-                        <li role="none"><a href="{% url 'accounts:profile' %}" role="menuitem">Perfil</a></li>
-                        <li role="none"><a href="{% url 'accounts:profile_edit' %}" role="menuitem">Editar Perfil</a></li>
-                        <li role="none"><hr></li>
-                        <li role="none"><a href="{% url 'accounts:logout' %}" role="menuitem">Sair</a></li>
-                    </ul>
-                </li>
-            </ul>
+                    
+                    <!-- User Info -->
+                    <div class="topbar-user">
+                        <span style="font-weight: 500;">{{ user.get_full_name|default:user.username }}</span>
+                    </div>
+                </div>
+            </header>
+            {% endif %}
+            
+            <!-- Messages (Toast style) -->
+            {% if messages %}
+            <div class="messages-container" role="region" aria-live="polite" aria-atomic="true" aria-label="Mensagens do sistema">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} animate-fade-in-up" role="alert">
+                    {{ message }}
+                    <button class="alert-close" aria-label="Fechar">&times;</button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- Main Content -->
+            <main class="content" id="main-content" role="main">
+                {% block content %}{% endblock %}
+            </main>
+            
+            <!-- Footer -->
+            {% if user.is_authenticated %}
+            <footer class="footer" role="contentinfo">
+                <div class="container">
+                    <p style="text-align: center; color: var(--neutral-600); font-size: 0.875rem;">
+                        &copy; 2026 TruK - Virtual Trucking Company Manager | ETS2
+                    </p>
+                </div>
+            </footer>
             {% endif %}
         </div>
-    </nav>
-
-    {% if messages %}
-    <div class="messages-container" role="region" aria-live="polite" aria-atomic="true" aria-label="Mensagens do sistema">
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}" role="alert">
-            {{ message }}
-        </div>
-        {% endfor %}
     </div>
-    {% endif %}
-
-    <main class="main-content" id="main-content" role="main">
-        <div class="container">
-            {% block content %}{% endblock %}
-        </div>
-    </main>
-
-    <footer class="footer" role="contentinfo">
-        <div class="container">
-            <p>&copy; 2026 TruK - Virtual Trucking Company Manager | ETS2</p>
-        </div>
-    </footer>
-
-    <script src="{% static 'js/accessibility.js' %}"></script>
+    
+    <!-- Scripts -->
+    <script src="{% static 'js/core/theme-toggle.js' %}"></script>
+    <script src="{% static 'js/core/sidebar.js' %}"></script>
+    <script src="{% static 'js/core/accessibility.js' %}"></script>
+    <script src="{% static 'js/components/toast.js' %}"></script>
+    
+    <!-- Global Search Keyboard Shortcut -->
+    <script>
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                document.getElementById('global-search')?.focus();
+            }
+        });
+        
+        // Auto-dismiss alerts after 5 seconds
+        document.querySelectorAll('.alert').forEach(alert => {
+            setTimeout(() => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            }, 5000);
+        });
+        
+        // Alert close button
+        document.querySelectorAll('.alert-close').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const alert = btn.closest('.alert');
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        });
+        
+        // Show sidebar toggle on mobile
+        if (window.innerWidth < 1024) {
+            const toggleBtn = document.getElementById('sidebar-toggle');
+            if (toggleBtn) toggleBtn.style.display = 'flex';
+        }
+    </script>
+    
     {% block extra_js %}{% endblock %}
 </body>
 </html>

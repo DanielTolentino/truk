@@ -3,21 +3,30 @@
 {% block title %}Deletar Carga - TruK{% endblock %}
 
 {% block content %}
-<div class="confirm-delete">
-    <h1>Confirmar Exclusão</h1>
-    
-    <div class="alert alert-warning">
-        <p>Tem certeza que deseja deletar esta carga?</p>
-        <p><strong>{{ load }}</strong></p>
-        <p>Esta ação não pode ser desfeita.</p>
-    </div>
-    
-    <form method="post">
-        {% csrf_token %}
-        <div class="form-actions">
-            <button type="submit" class="btn btn-danger">Sim, Deletar</button>
-            <a href="{% url 'loads:detail' load.pk %}" class="btn btn-secondary">Cancelar</a>
+<div style="max-width: 600px; margin: 0 auto; padding: var(--space-8);">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title" style="color: #ef4444;">⚠️ Confirmar Exclusão</h1>
         </div>
-    </form>
+        <div class="card-body">
+            <div style="padding: var(--space-4); background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; border-radius: var(--radius-lg); margin-bottom: var(--space-6);">
+                <p style="font-weight: 600; margin-bottom: var(--space-2);">Tem certeza que deseja deletar esta carga?</p>
+                <p style="font-size: var(--text-lg); font-weight: 700; color: var(--text-primary); margin-bottom: var(--space-2);">{{ load }}</p>
+                <p style="color: #ef4444; font-weight: 600; margin: 0;">⚠️ Esta ação não pode ser desfeita.</p>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div style="display: flex; gap: var(--space-3); justify-content: flex-end;">
+                    <a href="{% url 'loads:detail' load.pk %}" class="btn btn-ghost">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        🗑️ Sim, Deletar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}

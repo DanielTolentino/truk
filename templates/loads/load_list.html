@@ -3,85 +3,163 @@
 {% block title %}Minhas Cargas - TruK{% endblock %}
 
 {% block content %}
-<div class="loads-container">
-    <div class="page-header">
-        <h1>Minhas Cargas</h1>
-        <a href="{% url 'loads:create' %}" class="btn btn-primary">+ Nova Carga</a>
+<!-- Page Header -->
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Minhas Cargas</h1>
+        <p class="text-secondary" style="margin-top: var(--space-2);">
+            Gerencie todas as suas cargas registradas
+        </p>
     </div>
-    
-    <div class="filters">
-        <form method="get" class="filter-form">
-            <input type="text" name="search" placeholder="Buscar..." value="{{ request.GET.search }}" class="form-control">
+    <div class="page-actions">
+        <a href="{% url 'loads:create' %}" class="btn btn-primary">
+            <span>➕</span> Nova Carga
+        </a>
+    </div>
+</div>
+
+<!-- Filters Card -->
+<div class="card load-list-filters">
+    <div class="card-body">
+        <form method="get" class="load-list-filter-form">
+            <div class="form-group load-list-filter-field">
+                <label for="search" class="form-label">Buscar</label>
+                <input type="text" name="search" id="search" placeholder="Buscar por rota, carga..." value="{{ request.GET.search }}" class="form-input">
+            </div>
             
-            <select name="status" class="form-control">
-                <option value="">Todos os Status</option>
-                <option value="pendente" {% if request.GET.status == 'pendente' %}selected{% endif %}>Pendente</option>
-                <option value="em_andamento" {% if request.GET.status == 'em_andamento' %}selected{% endif %}>Em Andamento</option>
-                <option value="concluida" {% if request.GET.status == 'concluida' %}selected{% endif %}>Concluída</option>
-                <option value="falhada" {% if request.GET.status == 'falhada' %}selected{% endif %}>Falhada</option>
-            </select>
+            <div class="form-group load-list-filter-field">
+                <label for="status" class="form-label">Status</label>
+                <select name="status" id="status" class="form-select">
+                    <option value="">Todos os Status</option>
+                    <option value="pendente" {% if request.GET.status == 'pendente' %}selected{% endif %}>Pendente</option>
+                    <option value="em_andamento" {% if request.GET.status == 'em_andamento' %}selected{% endif %}>Em Andamento</option>
+                    <option value="concluida" {% if request.GET.status == 'concluida' %}selected{% endif %}>Concluída</option>
+                    <option value="falhada" {% if request.GET.status == 'falhada' %}selected{% endif %}>Falhada</option>
+                </select>
+            </div>
             
-            <button type="submit" class="btn btn-secondary">Filtrar</button>
+            <button type="submit" class="btn btn-primary load-list-filter-button">
+                🔍 Filtrar
+            </button>
+            
+            {% if request.GET.search or request.GET.status %}
+            <a href="{% url 'loads:list' %}" class="btn btn-ghost load-list-filter-button">
+                ✕ Limpar
+            </a>
+            {% endif %}
         </form>
     </div>
-    
-    {% if loads %}
-    <div class="table-responsive">
-        <table class="table">
-            <caption class="sr-only">Lista de todas as cargas registradas</caption>
-            <thead>
-                <tr>
-                    <th scope="col">Status</th>
-                    <th scope="col">Rota</th>
-                    <th scope="col">Carga</th>
-                    <th scope="col">Distância</th>
-                    <th scope="col">Pagamento</th>
-                    <th scope="col">Dano</th>
-                    <th scope="col">Data</th>
-                    <th scope="col">Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for load in loads %}
-                <tr>
-                    <td><span class="status-badge status-{{ load.status }}">{{ load.get_status_display }}</span></td>
-                    <td><strong>{{ load.rota }}</strong></td>
-                    <td>{{ load.tipo_carga }}</td>
-                    <td>{{ load.distancia_km }} km</td>
-                    <td>€{{ load.pagamento_eur }}</td>
-                    <td>{{ load.dano_percentual }}%</td>
-                    <td>{{ load.data_criacao|date:"d/m/Y" }}</td>
-                    <td>
-                        <a href="{% url 'loads:detail' load.pk %}" class="btn-sm btn-info">Ver</a>
-                        <a href="{% url 'loads:edit' load.pk %}" class="btn-sm btn-secondary">Editar</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+</div>
+
+<!-- Loads Table -->
+{% if loads %}
+<div class="card load-list-table">
+    <div class="card-body">
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Status</th>
+                        <th scope="col">Rota</th>
+                        <th scope="col">Carga</th>
+                        <th scope="col">Distância</th>
+                        <th scope="col">Pagamento</th>
+                        <th scope="col">Dano</th>
+                        <th scope="col">Data</th>
+                        <th scope="col" class="text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for load in loads %}
+                    <tr>
+                        <td>
+                            {% if load.status == 'concluida' %}
+                            <span class="badge badge-success">{{ load.get_status_display }}</span>
+                            {% elif load.status == 'em_andamento' %}
+                            <span class="badge badge-info">{{ load.get_status_display }}</span>
+                            {% elif load.status == 'pendente' %}
+                            <span class="badge badge-warning">{{ load.get_status_display }}</span>
+                            {% else %}
+                            <span class="badge badge-danger">{{ load.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td><strong>{{ load.rota }}</strong></td>
+                        <td>{{ load.tipo_carga }}</td>
+                        <td>{{ load.distancia_km }} km</td>
+                        <td><strong style="color: var(--primary-500);">€{{ load.pagamento_eur }}</strong></td>
+                        <td>
+                            {% if load.dano_percentual < 5 %}
+                            <span class="badge badge-success">{{ load.dano_percentual }}%</span>
+                            {% elif load.dano_percentual < 10 %}
+                            <span class="badge badge-warning">{{ load.dano_percentual }}%</span>
+                            {% else %}
+                            <span class="badge badge-danger">{{ load.dano_percentual }}%</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ load.data_criacao|date:"d/m/Y" }}</td>
+                        <td>
+                            <div class="table-actions">
+                                <a href="{% url 'loads:detail' load.pk %}" class="btn btn-sm btn-ghost" title="Ver detalhes">
+                                    👁️
+                                </a>
+                                <a href="{% url 'loads:edit' load.pk %}" class="btn btn-sm btn-ghost" title="Editar">
+                                    ✏️
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
     
+    <!-- Pagination -->
     {% if is_paginated %}
-    <div class="pagination">
-        {% if page_obj.has_previous %}
-        <a href="?page=1" class="btn btn-secondary">Primeira</a>
-        <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">Anterior</a>
-        {% endif %}
-        
-        <span class="page-info">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-        
-        {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">Próxima</a>
-        <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-secondary">Última</a>
-        {% endif %}
-    </div>
-    {% endif %}
-    
-    {% else %}
-    <div class="empty-state">
-        <p>Nenhuma carga encontrada.</p>
-        <a href="{% url 'loads:create' %}" class="btn btn-primary">Criar Primeira Carga</a>
+    <div class="card-footer">
+        <div class="table-pagination">
+            <div class="table-pagination-info">
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+            </div>
+            <div class="table-pagination-controls">
+                {% if page_obj.has_previous %}
+                <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="pagination-btn">
+                    ⏮️ Primeira
+                </a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="pagination-btn">
+                    ← Anterior
+                </a>
+                {% endif %}
+                
+                <span class="pagination-btn active">{{ page_obj.number }}</span>
+                
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="pagination-btn">
+                    Próxima →
+                </a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="pagination-btn">
+                    Última ⏭️
+                </a>
+                {% endif %}
+            </div>
+        </div>
     </div>
     {% endif %}
 </div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-state-icon">📦</div>
+    <div class="empty-state-title">Nenhuma carga encontrada</div>
+    <div class="empty-state-text">
+        {% if request.GET.search or request.GET.status %}
+        Nenhuma carga corresponde aos filtros aplicados.
+        {% else %}
+        Você ainda não registrou nenhuma carga. Comece criando sua primeira!
+        {% endif %}
+    </div>
+    <a href="{% url 'loads:create' %}" class="btn btn-primary load-list-empty-action">
+        ➕ Criar Primeira Carga
+    </a>
+</div>
+{% endif %}
 {% endblock %}

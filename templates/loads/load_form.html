@@ -3,130 +3,218 @@
 {% block title %}{% if object %}Editar{% else %}Nova{% endif %} Carga - TruK{% endblock %}
 
 {% block content %}
-<div class="form-container">
-    <h1>{% if object %}Editar Carga{% else %}Registrar Nova Carga{% endif %}</h1>
-    
-    <form method="post" enctype="multipart/form-data" class="load-form" aria-label="Formulário de carga">
+<section class="load-create">
+    <div class="load-create-hero">
+        <div class="load-create-hero-content">
+            <div class="load-create-badge">
+                <span class="load-create-badge-icon">🚚</span>
+                <span>{% if object %}Atualizar Carga{% else %}Nova Carga{% endif %}</span>
+            </div>
+            <h1 class="page-title">{% if object %}Atualize os detalhes da viagem{% else %}Registre uma nova carga{% endif %}</h1>
+            <p class="text-secondary">Organize as informações da rota, pagamento e status para manter seu histórico preciso.</p>
+            <div class="load-create-hero-actions">
+                <a href="{% url 'loads:list' %}" class="btn btn-ghost">← Voltar para cargas</a>
+                {% if object %}
+                <span class="load-create-hero-meta">Editando registro #{{ object.pk }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="load-create-hero-card">
+            <div class="load-create-hero-card-icon">📍</div>
+            <div>
+                <p class="load-create-hero-card-title">Rota principal</p>
+                <p class="load-create-hero-card-text">Origem e destino definem o centro da operação. Revise antes de enviar.</p>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="load-form card card-no-hover">
         {% csrf_token %}
-        
-        <fieldset>
-            <legend>Origem e Destino</legend>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="id_origem_cidade">Cidade de Origem *</label>
-                    {{ form.origem_cidade }}
-                    {% if form.origem_cidade.errors %}<span class="error" role="alert" aria-live="polite">{{ form.origem_cidade.errors }}</span>{% endif %}
+
+        <div class="card-body load-create-grid">
+            <section class="card load-create-section card-no-hover">
+                <div class="card-header">
+                    <div>
+                        <p class="load-create-section-title">Origem e destino</p>
+                        <p class="load-create-section-subtitle">As cidades definem o percurso principal.</p>
+                    </div>
+                    <span class="load-create-section-icon">🧭</span>
                 </div>
-                
-                <div class="form-group">
-                    <label for="id_origem_pais">País de Origem *</label>
-                    {{ form.origem_pais }}
-                    {% if form.origem_pais.errors %}<span class="error" role="alert" aria-live="polite">{{ form.origem_pais.errors }}</span>{% endif %}
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.origem_cidade.id_for_label }}" class="form-label required">Cidade de Origem</label>
+                            {{ form.origem_cidade }}
+                            {% if form.origem_cidade.errors %}
+                            <span class="form-text is-invalid">{{ form.origem_cidade.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.origem_pais.id_for_label }}" class="form-label required">País de Origem</label>
+                            {{ form.origem_pais }}
+                            {% if form.origem_pais.errors %}
+                            <span class="form-text is-invalid">{{ form.origem_pais.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.destino_cidade.id_for_label }}" class="form-label required">Cidade de Destino</label>
+                            {{ form.destino_cidade }}
+                            {% if form.destino_cidade.errors %}
+                            <span class="form-text is-invalid">{{ form.destino_cidade.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.destino_pais.id_for_label }}" class="form-label required">País de Destino</label>
+                            {{ form.destino_pais }}
+                            {% if form.destino_pais.errors %}
+                            <span class="form-text is-invalid">{{ form.destino_pais.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
+            </section>
+
+            <section class="card load-create-section card-no-hover">
+                <div class="card-header">
+                    <div>
+                        <p class="load-create-section-title">Carga e trailer</p>
+                        <p class="load-create-section-subtitle">Detalhes sobre o tipo de carga e veículo.</p>
+                    </div>
+                    <span class="load-create-section-icon">📦</span>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.tipo_carga.id_for_label }}" class="form-label required">Tipo de Carga</label>
+                            {{ form.tipo_carga }}
+                            {% if form.tipo_carga.errors %}
+                            <span class="form-text is-invalid">{{ form.tipo_carga.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.tipo_trailer.id_for_label }}" class="form-label">Tipo de Trailer</label>
+                            {{ form.tipo_trailer }}
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.peso_toneladas.id_for_label }}" class="form-label">Peso (toneladas)</label>
+                            {{ form.peso_toneladas }}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                            {{ form.status }}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card load-create-section card-no-hover">
+                <div class="card-header">
+                    <div>
+                        <p class="load-create-section-title">Distância e pagamento</p>
+                        <p class="load-create-section-subtitle">Registre a receita e o tamanho da rota.</p>
+                    </div>
+                    <span class="load-create-section-icon">💰</span>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.distancia_km.id_for_label }}" class="form-label required">Distância (km)</label>
+                            {{ form.distancia_km }}
+                            {% if form.distancia_km.errors %}
+                            <span class="form-text is-invalid">{{ form.distancia_km.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.pagamento_eur.id_for_label }}" class="form-label required">Pagamento (€)</label>
+                            {{ form.pagamento_eur }}
+                            {% if form.pagamento_eur.errors %}
+                            <span class="form-text is-invalid">{{ form.pagamento_eur.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card load-create-section card-no-hover">
+                <div class="card-header">
+                    <div>
+                        <p class="load-create-section-title">Detalhes da viagem</p>
+                        <p class="load-create-section-subtitle">Dados finais de desempenho e incidentes.</p>
+                    </div>
+                    <span class="load-create-section-icon">🛣️</span>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.combustivel_litros.id_for_label }}" class="form-label">Combustível (litros)</label>
+                            {{ form.combustivel_litros }}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.tempo_viagem.id_for_label }}" class="form-label">Tempo de Viagem (HH:MM:SS)</label>
+                            {{ form.tempo_viagem }}
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.dano_percentual.id_for_label }}" class="form-label">Dano (%)</label>
+                            {{ form.dano_percentual }}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.multas.id_for_label }}" class="form-label">Multas (€)</label>
+                            {{ form.multas }}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card load-create-section card-no-hover">
+                <div class="card-header">
+                    <div>
+                        <p class="load-create-section-title">Extras e observações</p>
+                        <p class="load-create-section-subtitle">Anexe evidencias ou detalhes adicionais.</p>
+                    </div>
+                    <span class="load-create-section-icon">🧾</span>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="{{ form.screenshot.id_for_label }}" class="form-label">Screenshot</label>
+                        {{ form.screenshot }}
+                        <span class="form-text">Faça upload de uma captura de tela da carga (opcional)</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.notas.id_for_label }}" class="form-label">Notas</label>
+                        {{ form.notas }}
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="card-footer load-create-footer">
+            <div class="load-create-footer-hint">
+                <span class="load-create-footer-icon">✔️</span>
+                <span>Campos marcados com * sao obrigatorios.</span>
             </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="id_destino_cidade">Cidade de Destino *</label>
-                    {{ form.destino_cidade }}
-                    {% if form.destino_cidade.errors %}<span class="error" role="alert" aria-live="polite">{{ form.destino_cidade.errors }}</span>{% endif %}
-                </div>
-                
-                <div class="form-group">
-                    <label for="id_destino_pais">País de Destino *</label>
-                    {{ form.destino_pais }}
-                    {% if form.destino_pais.errors %}<span class="error" role="alert" aria-live="polite">{{ form.destino_pais.errors }}</span>{% endif %}
-                </div>
+            <div class="load-create-footer-actions">
+                <a href="{% url 'loads:list' %}" class="btn btn-ghost">Cancelar</a>
+                <button type="submit" class="btn btn-primary">
+                    {% if object %}Salvar alteracoes{% else %}Registrar carga{% endif %}
+                </button>
             </div>
-        </fieldset>
-        
-        <fieldset>
-            <legend>Informações da Carga</legend>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="id_tipo_carga">Tipo de Carga *</label>
-                    {{ form.tipo_carga }}
-                    {% if form.tipo_carga.errors %}<span class="error" role="alert" aria-live="polite">{{ form.tipo_carga.errors }}</span>{% endif %}
-                </div>
-                
-                <div class="form-group">
-                    <label for="id_tipo_trailer">Tipo de Trailer</label>
-                    {{ form.tipo_trailer }}
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="id_peso_toneladas">Peso (toneladas)</label>
-                {{ form.peso_toneladas }}
-            </div>
-        </fieldset>
-        
-        <fieldset>
-            <legend>Distância e Pagamento</legend>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="id_distancia_km">Distância (km) *</label>
-                    {{ form.distancia_km }}
-                    {% if form.distancia_km.errors %}<span class="error" role="alert" aria-live="polite">{{ form.distancia_km.errors }}</span>{% endif %}
-                </div>
-                
-                <div class="form-group">
-                    <label for="id_pagamento_eur">Pagamento (€) *</label>
-                    {{ form.pagamento_eur }}
-                    {% if form.pagamento_eur.errors %}<span class="error" role="alert" aria-live="polite">{{ form.pagamento_eur.errors }}</span>{% endif %}
-                </div>
-            </div>
-        </fieldset>
-        
-        <fieldset>
-            <legend>Detalhes da Viagem</legend>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="id_combustivel_litros">Combustível (litros)</label>
-                    {{ form.combustivel_litros }}
-                </div>
-                
-                <div class="form-group">
-                    <label for="id_tempo_viagem">Tempo de Viagem (HH:MM:SS)</label>
-                    {{ form.tempo_viagem }}
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="id_dano_percentual">Dano (%)</label>
-                    {{ form.dano_percentual }}
-                </div>
-                
-                <div class="form-group">
-                    <label for="id_multas">Multas (€)</label>
-                    {{ form.multas }}
-                </div>
-            </div>
-        </fieldset>
-        
-        <fieldset>
-            <legend>Status e Extras</legend>
-            <div class="form-group">
-                <label for="id_status">Status</label>
-                {{ form.status }}
-            </div>
-            
-            <div class="form-group">
-                <label for="id_screenshot">Screenshot</label>
-                {{ form.screenshot }}
-            </div>
-            
-            <div class="form-group">
-                <label for="id_notas">Notas</label>
-                {{ form.notas }}
-            </div>
-        </fieldset>
-        
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">{% if object %}Atualizar{% else %}Registrar{% endif %}</button>
-            <a href="{% url 'loads:list' %}" class="btn btn-secondary">Cancelar</a>
         </div>
     </form>
-</div>
+</section>
+
 {% endblock %}
