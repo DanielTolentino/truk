@@ -89,7 +89,7 @@
                     <tbody>
                         {% for item in trailer_analysis %}
                         <tr>
-                            <td>{{ item.get_tipo_trailer_display|default:"N/A" }}</td>
+                            <td>{{ item.tipo_trailer_display }}</td>
                             <td><span class="badge badge-secondary">{{ item.count }}</span></td>
                             <td><strong style="color: var(--primary-500); font-size: var(--text-sm);">€{{ item.total_revenue|floatformat:0 }}</strong></td>
                         </tr>

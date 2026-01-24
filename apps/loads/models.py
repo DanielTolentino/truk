@@ -1,6 +1,12 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+
+
+class ActiveLoadManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted_at__isnull=True)
 
 
 class Load(models.Model):
@@ -99,6 +105,9 @@ class Load(models.Model):
     
     # Soft Delete
     deleted_at = models.DateTimeField(null=True, blank=True, verbose_name='Deletado em')
+
+    objects = ActiveLoadManager()
+    all_objects = models.Manager()
     
     class Meta:
         verbose_name = 'Carga'
@@ -130,18 +139,24 @@ class Load(models.Model):
     
     def iniciar(self):
         """Marca carga como em andamento"""
+        if self.status != 'pendente':
+            raise ValidationError('A carga precisa estar pendente para iniciar.')
         self.status = 'em_andamento'
         self.data_inicio = timezone.now()
         self.save()
     
     def concluir(self):
         """Marca carga como concluída"""
+        if self.status != 'em_andamento':
+            raise ValidationError('A carga precisa estar em andamento para concluir.')
         self.status = 'concluida'
         self.data_conclusao = timezone.now()
         self.save()
     
     def falhar(self):
         """Marca carga como falhada"""
+        if self.status != 'em_andamento':
+            raise ValidationError('A carga precisa estar em andamento para falhar.')
         self.status = 'falhada'
         self.data_conclusao = timezone.now()
         self.save()

@@ -17,15 +17,17 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         
         # Query base
         if user.is_admin:
-            loads = Load.objects.filter(deleted_at__isnull=True)
+            loads = Load.objects.select_related('motorista')
         else:
-            loads = Load.objects.filter(motorista=user, deleted_at__isnull=True)
+            loads = Load.objects.select_related('motorista').filter(motorista=user)
         
         # Estatísticas gerais
         total_loads = loads.count()
         completed_loads = loads.filter(status='concluida').count()
+        failed_loads = loads.filter(status='falhada').count()
+        completed_loads_qs = loads.filter(status='concluida')
         
-        stats = loads.aggregate(
+        stats = completed_loads_qs.aggregate(
             total_km=Sum('distancia_km'),
             total_revenue=Sum('pagamento_eur'),
             total_fines=Sum('multas'),
@@ -40,7 +42,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         active_loads = loads.filter(status='em_andamento')
         
         # Top rotas (mais utilizadas)
-        top_routes = loads.values(
+        top_routes = completed_loads_qs.values(
             'origem_cidade', 'destino_cidade'
         ).annotate(
             count=Count('id'),
@@ -66,6 +68,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context.update({
             'total_loads': total_loads,
             'completed_loads': completed_loads,
+            'failed_loads': failed_loads,
             'active_loads_count': active_loads.count(),
             'total_km': stats['total_km'] or 0,
             'total_revenue': stats['total_revenue'] or 0,
@@ -92,32 +95,38 @@ class AnalyticsView(LoginRequiredMixin, TemplateView):
         
         # Query base
         if user.is_admin:
-            loads = Load.objects.filter(deleted_at__isnull=True)
+            loads = Load.objects.select_related('motorista')
         else:
-            loads = Load.objects.filter(motorista=user, deleted_at__isnull=True)
+            loads = Load.objects.select_related('motorista').filter(motorista=user)
         
         # Análise por tipo de trailer
-        trailer_analysis = loads.values('tipo_trailer').annotate(
+        completed_loads_qs = loads.filter(status='concluida')
+
+        trailer_analysis = list(completed_loads_qs.values('tipo_trailer').annotate(
             count=Count('id'),
             total_revenue=Sum('pagamento_eur'),
             avg_damage=Avg('dano_percentual')
-        ).order_by('-count')
+        ).order_by('-count'))
+
+        trailer_display_map = dict(Load.TRAILER_CHOICES)
+        for item in trailer_analysis:
+            item['tipo_trailer_display'] = trailer_display_map.get(item['tipo_trailer'], 'N/A')
         
         # Análise por país de origem
-        origin_analysis = loads.values('origem_pais').annotate(
+        origin_analysis = completed_loads_qs.values('origem_pais').annotate(
             count=Count('id'),
             total_revenue=Sum('pagamento_eur')
         ).order_by('-count')[:10]
         
         # Análise por país de destino
-        destination_analysis = loads.values('destino_pais').annotate(
+        destination_analysis = completed_loads_qs.values('destino_pais').annotate(
             count=Count('id'),
             total_revenue=Sum('pagamento_eur')
         ).order_by('-count')[:10]
         
         # Performance por motorista (apenas para admin)
         if user.is_admin:
-            driver_performance = loads.values(
+            driver_performance = completed_loads_qs.values(
                 'motorista__username'
             ).annotate(
                 count=Count('id'),
@@ -131,9 +140,9 @@ class AnalyticsView(LoginRequiredMixin, TemplateView):
         revenue_evolution = []
         for i in range(11, -1, -1):
             date = timezone.now() - timedelta(days=30*i)
-            month_revenue = loads.filter(
-                data_criacao__year=date.year,
-                data_criacao__month=date.month
+            month_revenue = completed_loads_qs.filter(
+                data_conclusao__year=date.year,
+                data_conclusao__month=date.month
             ).aggregate(total=Sum('pagamento_eur'))['total'] or 0
             revenue_evolution.append({
                 'month': date.strftime('%b %Y'),

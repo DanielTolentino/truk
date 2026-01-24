@@ -24,25 +24,62 @@
         <form method="get" class="load-list-filter-form">
             <div class="form-group load-list-filter-field">
                 <label for="search" class="form-label">Buscar</label>
-                <input type="text" name="search" id="search" placeholder="Buscar por rota, carga..." value="{{ request.GET.search }}" class="form-input">
+                <input type="text" name="search" id="search" placeholder="Buscar por rota, carga..." value="{{ filter_form.search.value|default_if_none:'' }}" class="form-input">
             </div>
             
             <div class="form-group load-list-filter-field">
                 <label for="status" class="form-label">Status</label>
                 <select name="status" id="status" class="form-select">
-                    <option value="">Todos os Status</option>
-                    <option value="pendente" {% if request.GET.status == 'pendente' %}selected{% endif %}>Pendente</option>
-                    <option value="em_andamento" {% if request.GET.status == 'em_andamento' %}selected{% endif %}>Em Andamento</option>
-                    <option value="concluida" {% if request.GET.status == 'concluida' %}selected{% endif %}>Concluída</option>
-                    <option value="falhada" {% if request.GET.status == 'falhada' %}selected{% endif %}>Falhada</option>
+                    {% for value, label in filter_form.fields.status.choices %}
+                    <option value="{{ value }}" {% if filter_form.status.value == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
                 </select>
+            </div>
+
+            <div class="form-group load-list-filter-field">
+                <label for="tipo_trailer" class="form-label">Trailer</label>
+                <select name="tipo_trailer" id="tipo_trailer" class="form-select">
+                    {% for value, label in filter_form.fields.tipo_trailer.choices %}
+                    <option value="{{ value }}" {% if filter_form.tipo_trailer.value == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group load-list-filter-field">
+                <label for="origem_pais" class="form-label">País Origem</label>
+                <input type="text" name="origem_pais" id="origem_pais" value="{{ filter_form.origem_pais.value|default_if_none:'' }}" class="form-input">
+            </div>
+
+            <div class="form-group load-list-filter-field">
+                <label for="destino_pais" class="form-label">País Destino</label>
+                <input type="text" name="destino_pais" id="destino_pais" value="{{ filter_form.destino_pais.value|default_if_none:'' }}" class="form-input">
+            </div>
+
+            <div class="form-group load-list-filter-field">
+                <label for="date_from" class="form-label">Data Inicial</label>
+                <input type="date" name="date_from" id="date_from" value="{{ filter_form.date_from.value|default_if_none:'' }}" class="form-input">
+            </div>
+
+            <div class="form-group load-list-filter-field">
+                <label for="date_to" class="form-label">Data Final</label>
+                <input type="date" name="date_to" id="date_to" value="{{ filter_form.date_to.value|default_if_none:'' }}" class="form-input">
+            </div>
+
+            <div class="form-group load-list-filter-field">
+                <label for="min_payment" class="form-label">Pagamento Mín.</label>
+                <input type="number" name="min_payment" id="min_payment" step="0.01" value="{{ filter_form.min_payment.value|default_if_none:'' }}" class="form-input">
+            </div>
+
+            <div class="form-group load-list-filter-field">
+                <label for="max_payment" class="form-label">Pagamento Máx.</label>
+                <input type="number" name="max_payment" id="max_payment" step="0.01" value="{{ filter_form.max_payment.value|default_if_none:'' }}" class="form-input">
             </div>
             
             <button type="submit" class="btn btn-primary load-list-filter-button">
                 🔍 Filtrar
             </button>
             
-            {% if request.GET.search or request.GET.status %}
+            {% if request.GET %}
             <a href="{% url 'loads:list' %}" class="btn btn-ghost load-list-filter-button">
                 ✕ Limpar
             </a>
@@ -123,10 +160,10 @@
             </div>
             <div class="table-pagination-controls">
                 {% if page_obj.has_previous %}
-                <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="pagination-btn">
+                <a href="?page=1{% if querystring %}&{{ querystring }}{% endif %}" class="pagination-btn">
                     ⏮️ Primeira
                 </a>
-                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="pagination-btn">
+                <a href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}" class="pagination-btn">
                     ← Anterior
                 </a>
                 {% endif %}
@@ -134,10 +171,10 @@
                 <span class="pagination-btn active">{{ page_obj.number }}</span>
                 
                 {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="pagination-btn">
+                <a href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}" class="pagination-btn">
                     Próxima →
                 </a>
-                <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="pagination-btn">
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if querystring %}&{{ querystring }}{% endif %}" class="pagination-btn">
                     Última ⏭️
                 </a>
                 {% endif %}

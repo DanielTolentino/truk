@@ -92,7 +92,9 @@
                         placeholder="Buscar cargas, rotas... (Ctrl+K)" 
                         aria-label="Buscar"
                         id="global-search"
+                        autocomplete="off"
                     >
+                    <div id="global-search-results" class="search-results" aria-live="polite"></div>
                 </div>
                 
                 <!-- Topbar Actions -->
@@ -158,6 +160,74 @@
                 document.getElementById('global-search')?.focus();
             }
         });
+
+        const globalSearch = document.getElementById('global-search');
+        const globalSearchResults = document.getElementById('global-search-results');
+        if (globalSearch) {
+            globalSearch.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    const query = globalSearch.value.trim();
+                    if (query.length > 0) {
+                        window.location.href = `{% url 'loads:list' %}?search=${encodeURIComponent(query)}`;
+                    }
+                }
+            });
+
+            let searchTimeout;
+            globalSearch.addEventListener('input', () => {
+                const query = globalSearch.value.trim();
+                clearTimeout(searchTimeout);
+                if (!globalSearchResults) {
+                    return;
+                }
+                if (query.length < 2) {
+                    globalSearchResults.innerHTML = '';
+                    globalSearchResults.style.display = 'none';
+                    return;
+                }
+                searchTimeout = setTimeout(() => {
+                    fetch(`{% url 'loads:route_suggestions' %}?q=${encodeURIComponent(query)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (!data.results || data.results.length === 0) {
+                                globalSearchResults.innerHTML = '';
+                                globalSearchResults.style.display = 'none';
+                                return;
+                            }
+                            globalSearchResults.innerHTML = data.results
+                                .map(item => `<button type="button" class="search-result-item" data-label="${item.label}">${item.label}</button>`)
+                                .join('');
+                            globalSearchResults.style.display = 'block';
+                        })
+                        .catch(() => {
+                            globalSearchResults.innerHTML = '';
+                            globalSearchResults.style.display = 'none';
+                        });
+                }, 250);
+            });
+
+            globalSearchResults?.addEventListener('click', (event) => {
+                const target = event.target.closest('.search-result-item');
+                if (!target) {
+                    return;
+                }
+                const label = target.getAttribute('data-label');
+                if (label) {
+                    globalSearch.value = label;
+                    window.location.href = `{% url 'loads:list' %}?search=${encodeURIComponent(label)}`;
+                }
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!globalSearchResults) {
+                    return;
+                }
+                if (!globalSearch.contains(event.target) && !globalSearchResults.contains(event.target)) {
+                    globalSearchResults.style.display = 'none';
+                }
+            });
+        }
         
         // Auto-dismiss alerts after 5 seconds
         document.querySelectorAll('.alert').forEach(alert => {

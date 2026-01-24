@@ -79,7 +79,7 @@
         <div class="card-body" style="text-align: center;">
             <div style="font-size: 3rem; margin-bottom: var(--space-2);">🚚</div>
             <div style="font-size: var(--text-3xl); font-weight: 800; color: var(--primary-500); margin-bottom: var(--space-1);">
-                {{ profile_user.loads.count }}
+                {{ total_loads }}
             </div>
             <div style="font-size: var(--text-sm); font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">
                 Total de Cargas
@@ -91,7 +91,7 @@
         <div class="card-body" style="text-align: center;">
             <div style="font-size: 3rem; margin-bottom: var(--space-2);">✅</div>
             <div style="font-size: var(--text-3xl); font-weight: 800; color: #10b981; margin-bottom: var(--space-1);">
-                {{ profile_user.loads.filter(status='concluida').count }}
+                {{ completed_loads }}
             </div>
             <div style="font-size: var(--text-sm); font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">
                 Cargas Concluídas
@@ -103,7 +103,7 @@
         <div class="card-body" style="text-align: center;">
             <div style="font-size: 3rem; margin-bottom: var(--space-2);">📊</div>
             <div style="font-size: var(--text-3xl); font-weight: 800; color: var(--primary-500); margin-bottom: var(--space-1);">
-                {{ profile_user.loads.aggregate(total=Sum('pagamento_eur')).total|default:0|floatformat:0 }}€
+                {{ total_revenue|floatformat:0 }}€
             </div>
             <div style="font-size: var(--text-sm); font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">
                 Receita Total

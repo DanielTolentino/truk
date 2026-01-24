@@ -5,7 +5,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView, UpdateView, DetailView
 from django.urls import reverse_lazy
 from django.contrib import messages
-from .forms import CustomUserCreationForm, CustomAuthenticationForm
+from django.db.models import Sum
+from .forms import CustomUserCreationForm, CustomAuthenticationForm, ProfileUpdateForm
 from .models import User
 
 
@@ -38,11 +39,23 @@ class ProfileView(LoginRequiredMixin, DetailView):
     
     def get_object(self):
         return self.request.user
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.get_object()
+        cargas = user.cargas.all()
+        completed_cargas = cargas.filter(status='concluida')
+        
+        context['total_loads'] = cargas.count()
+        context['completed_loads'] = completed_cargas.count()
+        context['total_revenue'] = completed_cargas.aggregate(total=Sum('pagamento_eur'))['total'] or 0
+        
+        return context
 
 
 class ProfileEditView(LoginRequiredMixin, UpdateView):
     model = User
-    fields = ['first_name', 'last_name', 'email', 'avatar', 'bio']
+    form_class = ProfileUpdateForm
     template_name = 'accounts/profile_edit.html'
     success_url = reverse_lazy('accounts:profile')
     
