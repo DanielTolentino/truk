@@ -9,6 +9,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
+  min-height: 44px;
   padding: var(--space-3) var(--space-6);
   font-size: var(--text-base);
   font-weight: 600;
@@ -22,6 +23,11 @@
   position: relative;
   overflow: hidden;
   font-family: inherit;
+}
+
+.btn > span {
+  display: inline-flex;
+  align-items: center;
 }
 
 .btn:focus {
@@ -39,11 +45,13 @@
 .btn-sm {
   padding: var(--space-2) var(--space-4);
   font-size: var(--text-sm);
+  min-height: 36px;
 }
 
 .btn-lg {
   padding: var(--space-4) var(--space-8);
   font-size: var(--text-lg);
+  min-height: 52px;
 }
 
 /* Primary Button */
@@ -55,7 +63,7 @@
 
 .btn-primary:hover {
   background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: var(--shadow-lg);
 }
 
@@ -68,7 +76,7 @@
 
 .btn-secondary:hover {
   background: linear-gradient(135deg, var(--secondary-600), var(--secondary-700));
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: var(--shadow-lg);
 }
 
@@ -77,10 +85,12 @@
   background: transparent;
   color: var(--text-primary);
   box-shadow: none;
+  border: 1px solid transparent;
 }
 
 .btn-ghost:hover {
   background: var(--bg-secondary);
+  border-color: var(--glass-border);
   transform: translateY(-1px);
 }
 

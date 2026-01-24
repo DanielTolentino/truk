@@ -38,12 +38,12 @@
                     <span class="sidebar-label">Dashboard</span>
                 </a>
                 
-                <a href="{% url 'loads:list' %}" class="sidebar-item {% if 'loads' in request.path %}active{% endif %}">
+                <a href="{% url 'loads:list' %}" class="sidebar-item {% if request.resolver_match.app_name == 'loads' and request.resolver_match.url_name != 'create' %}active{% endif %}">
                     <span class="sidebar-icon" aria-hidden="true">🚛</span>
                     <span class="sidebar-label">Minhas Cargas</span>
                 </a>
                 
-                <a href="{% url 'loads:create' %}" class="sidebar-item">
+                <a href="{% url 'loads:create' %}" class="sidebar-item {% if request.resolver_match.app_name == 'loads' and request.resolver_match.url_name == 'create' %}active{% endif %}">
                     <span class="sidebar-icon" aria-hidden="true">➕</span>
                     <span class="sidebar-label">Nova Carga</span>
                 </a>

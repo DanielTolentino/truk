@@ -19,7 +19,7 @@
 </div>
 
 <!-- Revenue Evolution Chart -->
-<div class="card" style="margin-bottom: var(--space-6);">
+<div class="card analytics-card">
     <div class="card-header">
         <h2 class="card-title">Evolução da Receita (12 meses)</h2>
     </div>
@@ -30,7 +30,7 @@
 
 <!-- Driver Performance Table -->
 {% if driver_performance %}
-<div class="card" style="margin-bottom: var(--space-6);">
+<div class="card analytics-card">
     <div class="card-header">
         <h2 class="card-title">Performance por Motorista</h2>
     </div>
@@ -70,13 +70,13 @@
 {% endif %}
 
 <!-- Analysis Grid -->
-<div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-6);">
+<div class="dashboard-grid analytics-grid">
     <!-- Trailer Analysis -->
     <div class="card">
         <div class="card-header">
             <h2 class="card-title">Análise por Trailer</h2>
         </div>
-        <div class="card-body" style="padding: 0;">
+        <div class="card-body analytics-table">
             <div class="table-container">
                 <table class="table table-compact">
                     <thead>
@@ -105,7 +105,7 @@
         <div class="card-header">
             <h2 class="card-title">Top Países de Origem</h2>
         </div>
-        <div class="card-body" style="padding: 0;">
+        <div class="card-body analytics-table">
             <div class="table-container">
                 <table class="table table-compact">
                     <thead>
@@ -134,7 +134,7 @@
         <div class="card-header">
             <h2 class="card-title">Top Países de Destino</h2>
         </div>
-        <div class="card-body" style="padding: 0;">
+        <div class="card-body analytics-table">
             <div class="table-container">
                 <table class="table table-compact">
                     <thead>

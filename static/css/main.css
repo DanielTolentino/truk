@@ -28,6 +28,7 @@
 /* ========== LAYOUTS ========== */
 @import 'layouts/dashboard.css';
 @import 'layouts/auth.css';
+@import 'layouts/loads.css';
 
 /* ========== GLOBAL STYLES ========== */
 body {
@@ -71,6 +72,10 @@ body {
   margin-bottom: var(--space-xl);
   gap: var(--space-lg);
   flex-wrap: wrap;
+}
+
+.page-header .page-title {
+  margin-bottom: 0;
 }
 
 .page-title {

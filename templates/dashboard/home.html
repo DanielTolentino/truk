@@ -103,7 +103,7 @@
 </div>
 
 <!-- Charts and Recent Loads -->
-<div class="dashboard-grid" style="grid-template-columns: 2fr 1fr; margin-top: var(--space-6);">
+<div class="dashboard-grid dashboard-hero-grid">
     <!-- Chart Card -->
     <div class="card">
         <div class="card-header">
@@ -121,17 +121,17 @@
         </div>
         <div class="card-body">
             {% if recent_loads %}
-            <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-3);">
+            <ul class="dashboard-recent-list">
                 {% for load in recent_loads %}
                 <li>
-                    <a href="{% url 'loads:detail' load.pk %}" style="text-decoration: none; color: inherit;">
-                        <div class="glass-hover" style="padding: var(--space-3); border-radius: var(--radius-lg);">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
+                    <a href="{% url 'loads:detail' load.pk %}" class="dashboard-recent-link">
+                        <div class="dashboard-recent-card">
+                            <div class="dashboard-recent-meta">
                                 <span class="badge badge-primary">{{ load.get_status_display }}</span>
-                                <span style="font-weight: 700; color: var(--primary-500);">€{{ load.pagamento_eur }}</span>
+                                <span class="dashboard-recent-value">€{{ load.pagamento_eur }}</span>
                             </div>
-                            <div style="font-weight: 600; color: var(--text-primary); margin-bottom: var(--space-1);">{{ load.rota }}</div>
-                            <small style="color: var(--text-tertiary); font-size: var(--text-sm);">{{ load.data_criacao|date:"d/m/Y H:i" }}</small>
+                            <div class="dashboard-recent-route">{{ load.rota }}</div>
+                            <small class="dashboard-recent-date">{{ load.data_criacao|date:"d/m/Y H:i" }}</small>
                         </div>
                     </a>
                 </li>
@@ -145,7 +145,7 @@
             </div>
             {% endif %}
         </div>
-        <div class="card-footer" style="padding: var(--space-4); border-top: 1px solid var(--glass-border);">
+        <div class="card-footer dashboard-recent-footer">
             <a href="{% url 'loads:list' %}" class="btn btn-ghost btn-block">Ver Todas as Cargas</a>
         </div>
     </div>
@@ -153,7 +153,7 @@
 
 <!-- Top Routes Table -->
 {% if top_routes %}
-<div class="card" style="margin-top: var(--space-6);">
+<div class="card dashboard-top-routes">
     <div class="card-header">
         <h2 class="card-title">Top Rotas</h2>
     </div>
