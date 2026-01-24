@@ -59,3 +59,4 @@ coverage.xml
 
 # Pytest
 .pytest_cache/
+*.backup

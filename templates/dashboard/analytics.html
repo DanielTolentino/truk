@@ -3,107 +3,63 @@
 {% block title %}Analytics - TruK{% endblock %}
 
 {% block content %}
-<div class="analytics">
-    <h1>Analytics Avançado</h1>
-    
-    <div class="chart-container">
-        <h2>Evolução da Receita (12 meses)</h2>
-        <div id="revenueChart"></div>
+<!-- Page Header -->
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Analytics Avançado</h1>
+        <p class="text-secondary" style="margin-top: var(--space-2);">
+            Análise detalhada de performance e estatísticas
+        </p>
     </div>
-    
-    {% if driver_performance %}
-    <div class="performance-table">
-        <h2>Performance por Motorista</h2>
-        <table class="table">
-            <caption class="sr-only">Performance detalhada por motorista</caption>
-            <thead>
-                <tr>
-                    <th scope="col">Motorista</th>
-                    <th scope="col">Cargas</th>
-                    <th scope="col">Receita Total</th>
-                    <th scope="col">Dano Médio</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for driver in driver_performance %}
-                <tr>
-                    <td>{{ driver.motorista__username }}</td>
-                    <td>{{ driver.count }}</td>
-                    <td>€{{ driver.total_revenue|floatformat:2 }}</td>
-                    <td>{{ driver.avg_damage|floatformat:2 }}%</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="page-actions">
+        <a href="{% url 'dashboard:home' %}" class="btn btn-ghost">
+            ← Voltar ao Dashboard
+        </a>
     </div>
-    {% endif %}
-    
-    <div class="analytics-grid">
-        <div class="analysis-card">
-            <h2>Análise por Trailer</h2>
+</div>
+
+<!-- Revenue Evolution Chart -->
+<div class="card" style="margin-bottom: var(--space-6);">
+    <div class="card-header">
+        <h2 class="card-title">Evolução da Receita (12 meses)</h2>
+    </div>
+    <div class="card-body">
+        <canvas id="revenueChart"></canvas>
+    </div>
+</div>
+
+<!-- Driver Performance Table -->
+{% if driver_performance %}
+<div class="card" style="margin-bottom: var(--space-6);">
+    <div class="card-header">
+        <h2 class="card-title">Performance por Motorista</h2>
+    </div>
+    <div class="card-body" style="padding: 0;">
+        <div class="table-container">
             <table class="table">
-                <caption class="sr-only">Análise detalhada por tipo de trailer</caption>
                 <thead>
                     <tr>
-                        <th scope="col">Tipo</th>
-                        <th scope="col">Qtd</th>
-                        <th scope="col">Receita</th>
+                        <th scope="col">Motorista</th>
+                        <th scope="col">Cargas</th>
+                        <th scope="col">Receita Total</th>
                         <th scope="col">Dano Médio</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for item in trailer_analysis %}
+                    {% for driver in driver_performance %}
                     <tr>
-                        <td>{{ item.get_tipo_trailer_display|default:"N/A" }}</td>
-                        <td>{{ item.count }}</td>
-                        <td>€{{ item.total_revenue|floatformat:2 }}</td>
-                        <td>{{ item.avg_damage|floatformat:2 }}%</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        
-        <div class="analysis-card">
-            <h2>Top Países de Origem</h2>
-            <table class="table">
-                <caption class="sr-only">Top países de origem das cargas</caption>
-                <thead>
-                    <tr>
-                        <th scope="col">País</th>
-                        <th scope="col">Cargas</th>
-                        <th scope="col">Receita</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in origin_analysis %}
-                    <tr>
-                        <td>{{ item.origem_pais }}</td>
-                        <td>{{ item.count }}</td>
-                        <td>€{{ item.total_revenue|floatformat:2 }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        
-        <div class="analysis-card">
-            <h2>Top Países de Destino</h2>
-            <table class="table">
-                <caption class="sr-only">Top países de destino das cargas</caption>
-                <thead>
-                    <tr>
-                        <th scope="col">País</th>
-                        <th scope="col">Cargas</th>
-                        <th scope="col">Receita</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in destination_analysis %}
-                    <tr>
-                        <td>{{ item.destino_pais }}</td>
-                        <td>{{ item.count }}</td>
-                        <td>€{{ item.total_revenue|floatformat:2 }}</td>
+                        <td><strong>{{ driver.motorista__username }}</strong></td>
+                        <td><span class="badge badge-primary">{{ driver.count }}</span></td>
+                        <td><strong style="color: var(--primary-500);">€{{ driver.total_revenue|floatformat:2 }}</strong></td>
+                        <td>
+                            {% if driver.avg_damage < 5 %}
+                            <span class="badge badge-success">{{ driver.avg_damage|floatformat:2 }}%</span>
+                            {% elif driver.avg_damage < 10 %}
+                            <span class="badge badge-warning">{{ driver.avg_damage|floatformat:2 }}%</span>
+                            {% else %}
+                            <span class="badge badge-danger">{{ driver.avg_damage|floatformat:2 }}%</span>
+                            {% endif %}
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -111,25 +67,147 @@
         </div>
     </div>
 </div>
+{% endif %}
+
+<!-- Analysis Grid -->
+<div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-6);">
+    <!-- Trailer Analysis -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Análise por Trailer</h2>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            <div class="table-container">
+                <table class="table table-compact">
+                    <thead>
+                        <tr>
+                            <th scope="col">Tipo</th>
+                            <th scope="col">Qtd</th>
+                            <th scope="col">Receita</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in trailer_analysis %}
+                        <tr>
+                            <td>{{ item.get_tipo_trailer_display|default:"N/A" }}</td>
+                            <td><span class="badge badge-secondary">{{ item.count }}</span></td>
+                            <td><strong style="color: var(--primary-500); font-size: var(--text-sm);">€{{ item.total_revenue|floatformat:0 }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Origin Countries -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Top Países de Origem</h2>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            <div class="table-container">
+                <table class="table table-compact">
+                    <thead>
+                        <tr>
+                            <th scope="col">País</th>
+                            <th scope="col">Cargas</th>
+                            <th scope="col">Receita</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in origin_analysis %}
+                        <tr>
+                            <td><strong>{{ item.origem_pais }}</strong></td>
+                            <td><span class="badge badge-secondary">{{ item.count }}</span></td>
+                            <td><strong style="color: var(--primary-500); font-size: var(--text-sm);">€{{ item.total_revenue|floatformat:0 }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Destination Countries -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Top Países de Destino</h2>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            <div class="table-container">
+                <table class="table table-compact">
+                    <thead>
+                        <tr>
+                            <th scope="col">País</th>
+                            <th scope="col">Cargas</th>
+                            <th scope="col">Receita</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in destination_analysis %}
+                        <tr>
+                            <td><strong>{{ item.destino_pais }}</strong></td>
+                            <td><span class="badge badge-secondary">{{ item.count }}</span></td>
+                            <td><strong style="color: var(--primary-500); font-size: var(--text-sm);">€{{ item.total_revenue|floatformat:0 }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
-    // Gráfico de evolução de receita
+    // Chart.js - Revenue Evolution
     const revenueData = {{ revenue_evolution|safe }};
-    const revenueTrace = {
-        x: revenueData.map(d => d.month),
-        y: revenueData.map(d => d.revenue),
-        type: 'scatter',
-        mode: 'lines+markers',
-        line: { color: '#27ae60', width: 3 },
-        marker: { size: 8 }
-    };
     
-    const revenueLayout = {
-        title: '',
-        xaxis: { title: 'Mês' },
-        yaxis: { title: 'Receita (€)' }
-    };
-    
-    Plotly.newPlot('revenueChart', [revenueTrace], revenueLayout, {responsive: true});
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: revenueData.map(d => d.month),
+            datasets: [{
+                label: 'Receita (€)',
+                data: revenueData.map(d => d.revenue),
+                borderColor: 'rgba(255, 107, 53, 1)',
+                backgroundColor: 'rgba(255, 107, 53, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                pointBackgroundColor: 'rgba(255, 107, 53, 1)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 2.5,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    cornerRadius: 8
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '€' + value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
 </script>
 {% endblock %}
