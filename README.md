@@ -166,3 +166,38 @@ Para dúvidas ou sugestões, abra uma issue no GitHub.
 ---
 
 **Desenvolvido com ❤️ para a comunidade ETS2**
+
+## 🎨 Design System
+
+O TruK utiliza um sistema de design moderno chamado **"Road & Fire"**, inspirado nas estradas e na energia do transporte rodoviário.
+
+### Características
+
+- **Glassmorphism**: Efeitos de vidro translúcido
+- **Dark Mode**: Suporte completo a tema escuro
+- **Responsivo**: Mobile-first, funciona em todos os dispositivos
+- **Acessível**: WCAG 2.1 AA compliant
+- **Animações**: Suaves e respeitam preferências de movimento reduzido
+
+### Cores Principais
+
+| Cor | Hex | Uso |
+|-----|-----|-----|
+| Primary (Orange) | `#FF6B35` | Ações principais |
+| Secondary (Red) | `#C73E1D` | Acentos |
+| Accent (Yellow) | `#FFB627` | Destaques |
+
+### Documentação Completa
+
+Veja [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) para documentação completa de componentes e uso.
+
+### Estrutura CSS
+
+```
+static/css/
+├── base/           # Reset, variáveis, tipografia
+├── components/     # Botões, cards, forms, tables, etc.
+├── layouts/        # Dashboard, auth
+├── utils/          # Animações, utilitários
+└── main.css        # Entry point
+```
