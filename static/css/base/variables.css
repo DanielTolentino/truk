@@ -1,0 +1,86 @@
+/* CSS Variables - Design System - Road & Fire Theme */
+
+:root {
+  /* Primary Colors - Orange/Red Theme */
+  --primary: #FF6B35;
+  --primary-dark: #E55A2B;
+  --primary-light: #FF8A5C;
+  --secondary: #C73E1D;
+  --accent: #FFB627;
+  
+  /* Neutral Colors */
+  --neutral-900: #1A1A1A;
+  --neutral-800: #2D2D2D;
+  --neutral-700: #404040;
+  --neutral-600: #666666;
+  --neutral-500: #999999;
+  --neutral-400: #CCCCCC;
+  --neutral-300: #E5E5E5;
+  --neutral-200: #F2F2F2;
+  --neutral-100: #F9F9F9;
+  --neutral-50: #FFFFFF;
+  
+  /* Semantic */
+  --success: #34C759;
+  --danger: #FF3B30;
+  --warning: #FFB627;
+  --info: #007AFF;
+  
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  
+  /* Backgrounds */
+  --bg-primary: linear-gradient(135deg, #FFF5F0 0%, #FFE8DC 100%);
+  --bg-card: rgba(255, 255, 255, 0.85);
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+  --shadow-glow: 0 0 20px rgba(255, 107, 53, 0.3);
+  
+  /* Spacing */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+  
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 350ms ease;
+  
+  /* Layout */
+  --sidebar-width: 240px;
+  --sidebar-collapsed: 60px;
+  --topbar-height: 64px;
+  
+  /* Blur */
+  --blur-sm: blur(4px);
+  --blur-md: blur(8px);
+  --blur-lg: blur(16px);
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  --primary: #FF7A50;
+  --neutral-900: #F9F9F9;
+  --neutral-100: #1A1A1A;
+  --neutral-50: #0F0F0F;
+  --glass-bg: rgba(26, 26, 26, 0.7);
+  --bg-primary: linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 100%);
+  --bg-card: rgba(45, 45, 45, 0.7);
+  --shadow-glow: 0 0 30px rgba(255, 107, 53, 0.5);
+}
