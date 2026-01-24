@@ -1,0 +1,94 @@
+/* ============================================
+   ACCESSIBILITY UTILITIES
+   WCAG 2.1 AA Compliance
+   ============================================ */
+
+/* ========== SKIP LINKS ========== */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--primary-500);
+  color: white;
+  padding: var(--space-3) var(--space-6);
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 0 0 var(--radius-md) 0;
+  z-index: 10000;
+  transition: top var(--transition-fast);
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 3px solid var(--accent-500);
+  outline-offset: 2px;
+}
+
+/* ========== SCREEN READER ONLY ========== */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sr-only-focusable:focus,
+.sr-only-focusable:active {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* ========== FOCUS INDICATORS ========== */
+a:focus,
+button:focus,
+input:focus,
+textarea:focus,
+select:focus,
+[tabindex]:focus {
+  outline: 3px solid var(--primary-500);
+  outline-offset: 2px;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--primary-500);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px var(--primary-500-alpha);
+}
+
+a:focus:not(:focus-visible),
+button:focus:not(:focus-visible),
+[tabindex]:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ========== HIGH CONTRAST MODE ========== */
+@media (prefers-contrast: high) {
+  .card, .btn, .form-input, .form-select, .form-textarea {
+    border-width: 3px;
+  }
+  body { font-weight: 500; }
+  h1, h2, h3, h4, h5, h6, .btn, .badge { font-weight: 700; }
+}
+
+/* ========== TOUCH TARGETS ========== */
+@media (pointer: coarse) {
+  a, button, input[type="button"], input[type="submit"],
+  input[type="checkbox"], input[type="radio"], select {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

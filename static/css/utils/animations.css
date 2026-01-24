@@ -1,1 +1,30 @@
 /* Animations utilities - TODO: Add full implementation */
+
+/* ============================================
+   REDUCED MOTION SUPPORT
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .fade-in, .fade-out {
+    animation: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .slide-in-right, .slide-in-left, .slide-in-top, .slide-in-bottom,
+  .scale-in, .scale-out, .bounce, .shake, .spin, .stagger-item {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .hover-lift:hover, .hover-grow:hover {
+    transform: none;
+  }
+}
