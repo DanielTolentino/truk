@@ -53,6 +53,11 @@
                     <span class="sidebar-label">Analytics</span>
                 </a>
                 
+                <a href="{% url 'achievements:list' %}" class="sidebar-item {% if request.resolver_match.app_name == 'achievements' %}active{% endif %}">
+                    <span class="sidebar-icon" aria-hidden="true">🏆</span>
+                    <span class="sidebar-label">Conquistas</span>
+                </a>
+                
                 {% if user.is_admin %}
                 <a href="{% url 'admin:index' %}" class="sidebar-item">
                     <span class="sidebar-icon" aria-hidden="true">⚙️</span>

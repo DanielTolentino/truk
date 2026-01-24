@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'apps.accounts',
     'apps.loads',
     'apps.dashboard',
+    'apps.achievements',
 ]
 
 MIDDLEWARE = [

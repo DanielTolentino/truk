@@ -5,6 +5,7 @@ app_name = 'loads'
 
 urlpatterns = [
     path('', views.LoadListView.as_view(), name='list'),
+    path('export/csv/', views.LoadExportCSVView.as_view(), name='export_csv'),
     path('search/routes/', views.load_route_suggestions, name='route_suggestions'),
     path('create/', views.LoadCreateView.as_view(), name='create'),
     path('<int:pk>/', views.LoadDetailView.as_view(), name='detail'),

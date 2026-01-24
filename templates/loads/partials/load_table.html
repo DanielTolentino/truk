@@ -1,0 +1,130 @@
+{% if loads %}
+<div class="card load-list-table" id="loads-table-container">
+    <div class="card-body">
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Status</th>
+                        <th scope="col">Rota</th>
+                        <th scope="col">Carga</th>
+                        <th scope="col">Distância</th>
+                        <th scope="col">Pagamento</th>
+                        <th scope="col">Dano</th>
+                        <th scope="col">Data</th>
+                        <th scope="col" class="text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for load in loads %}
+                    <tr>
+                        <td>
+                            {% if load.status == 'concluida' %}
+                            <span class="badge badge-success">{{ load.get_status_display }}</span>
+                            {% elif load.status == 'em_andamento' %}
+                            <span class="badge badge-info">{{ load.get_status_display }}</span>
+                            {% elif load.status == 'pendente' %}
+                            <span class="badge badge-warning">{{ load.get_status_display }}</span>
+                            {% else %}
+                            <span class="badge badge-danger">{{ load.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td><strong>{{ load.rota }}</strong></td>
+                        <td>{{ load.tipo_carga }}</td>
+                        <td>{{ load.distancia_km }} km</td>
+                        <td><strong style="color: var(--primary-500);">€{{ load.pagamento_eur }}</strong></td>
+                        <td>
+                            {% if load.dano_percentual < 5 %}
+                            <span class="badge badge-success">{{ load.dano_percentual }}%</span>
+                            {% elif load.dano_percentual < 10 %}
+                            <span class="badge badge-warning">{{ load.dano_percentual }}%</span>
+                            {% else %}
+                            <span class="badge badge-danger">{{ load.dano_percentual }}%</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ load.data_criacao|date:"d/m/Y" }}</td>
+                        <td>
+                            <div class="table-actions">
+                                <a href="{% url 'loads:detail' load.pk %}" class="btn btn-sm btn-ghost" title="Ver detalhes">
+                                    👁️
+                                </a>
+                                <a href="{% url 'loads:edit' load.pk %}" class="btn btn-sm btn-ghost" title="Editar">
+                                    ✏️
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="card-footer">
+        <div class="table-pagination">
+            <div class="table-pagination-info">
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+            </div>
+            <div class="table-pagination-controls">
+                {% if page_obj.has_previous %}
+                <a href="?page=1{% if querystring %}&{{ querystring }}{% endif %}" 
+                   class="pagination-btn"
+                   hx-get="?page=1{% if querystring %}&{{ querystring }}{% endif %}"
+                   hx-target="#loads-results"
+                   hx-swap="innerHTML"
+                   hx-push-url="true">
+                    ⏮️ Primeira
+                </a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}" 
+                   class="pagination-btn"
+                   hx-get="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}"
+                   hx-target="#loads-results"
+                   hx-swap="innerHTML"
+                   hx-push-url="true">
+                    ← Anterior
+                </a>
+                {% endif %}
+                
+                <span class="pagination-btn active">{{ page_obj.number }}</span>
+                
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}" 
+                   class="pagination-btn"
+                   hx-get="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}"
+                   hx-target="#loads-results"
+                   hx-swap="innerHTML"
+                   hx-push-url="true">
+                    Próxima →
+                </a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if querystring %}&{{ querystring }}{% endif %}" 
+                   class="pagination-btn"
+                   hx-get="?page={{ page_obj.paginator.num_pages }}{% if querystring %}&{{ querystring }}{% endif %}"
+                   hx-target="#loads-results"
+                   hx-swap="innerHTML"
+                   hx-push-url="true">
+                    Última ⏭️
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-state-icon">📦</div>
+    <div class="empty-state-title">Nenhuma carga encontrada</div>
+    <div class="empty-state-text">
+        {% if request.GET.search or request.GET.status %}
+        Nenhuma carga corresponde aos filtros aplicados.
+        {% else %}
+        Você ainda não registrou nenhuma carga. Comece criando sua primeira!
+        {% endif %}
+    </div>
+    <a href="{% url 'loads:create' %}" class="btn btn-primary load-list-empty-action">
+        ➕ Criar Primeira Carga
+    </a>
+</div>
+{% endif %}
